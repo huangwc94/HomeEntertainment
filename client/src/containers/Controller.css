@@ -1,0 +1,61 @@
+.Controller{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.player-input-container{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex:1;
+}
+
+.player-ready-container{
+    width: 100%;
+    flex:1;
+    text-align: center;
+}
+
+.player-input{
+    margin-top:10vh;
+    text-align: center;
+}
+
+.player-input .input{
+    flex-grow: 1;
+    width: 100%;
+    margin-top:5vh;
+
+    font-size: calc(20px + 5vmin);
+    text-align: center;
+}
+.player-input-button {
+    height:10vmax;
+    width: 100vw;
+    border-radius: 0 !important;
+}
+
+.player-input-button span{
+    font-size: calc(30px + 2vmin);
+}
+
+.close-button {
+    position: absolute;
+    top:0;
+    right:0;
+}
+
+.controller-player-list{
+    width:100%;
+
+    align-items: center;
+}
+.controller-player-list li {
+    width: 100%;
+}
+.controller-player-list li div span{
+    font-size: calc(20px + 2vmin);
+}

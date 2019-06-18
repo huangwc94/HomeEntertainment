@@ -1,5 +1,5 @@
-import {IGame} from '../components/Game';
-import {Room} from '../components/Room';
+import {IGame} from '../core/Game';
+import {Room} from '../core/Room';
 import {BlackJack} from './BlackJack';
 
 export function gameFactory(gameType: string, room: Room): IGame {

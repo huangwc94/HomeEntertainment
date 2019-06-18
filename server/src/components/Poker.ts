@@ -8,6 +8,7 @@ export enum CardSuit {
 export interface ICard {
     suit: CardSuit;
     value: number;
+    show: boolean;
 }
 
 
@@ -30,7 +31,7 @@ export class Poker {
                 if (typeof suit === 'string') {
                     const eSuit = suit as CardSuit;
                     for (let value = 1; value < 14; value++) {
-                        this.cardPool.push({suit: eSuit, value});
+                        this.cardPool.push({suit: eSuit, value, show: true});
                     }
                 }
             }
@@ -42,7 +43,7 @@ export class Poker {
         return this.cardPool.length;
     }
 
-    public random_get() {
+    public randomGet() {
         if (this.card_left() <= 0) {
             return null;
         }
