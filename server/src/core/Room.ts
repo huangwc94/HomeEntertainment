@@ -90,7 +90,6 @@ export class Room {
             }
             this.broadcastFullUpdate();
         });
-        player.getSocket().on(SocketEvent.DISCONNECT, () => this.onPlayerLeave(player));
     }
 
     public onRoomClose() {
@@ -103,7 +102,7 @@ export class Room {
         if (!!this.tickHandle) {
             clearInterval(this.tickHandle);
         }
-        this.tickHandle = setInterval(() => this.tick(), 1000);
+        this.tickHandle = setInterval(() => this.tick(), this.config.tickFrequency);
         this.broadcastFullUpdate();
     }
 

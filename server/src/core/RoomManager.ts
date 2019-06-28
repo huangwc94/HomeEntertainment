@@ -21,11 +21,37 @@ export class RoomManager {
 
     public onSocketConnect(socket: Socket) {
         socket.on(SocketEvent.DISCONNECT, () => this.onDisconnect(socket));
-        socket.on(SocketEvent.CLIENT_LOGIN, (creds: ILoginCreds) => this.onLogin(socket, creds));
     }
 
-    private static verifyCredential(creds: ILoginCreds): boolean {
-        return true;
+    public onPlayerLogin(socket: Socket, creds: ILoginCreds) {
+        const rm = Object.values(this.rooms).find((room) => room.getRoomName() === creds.data);
+        const player = new PlayerController(creds.name, socket);
+        Logger.Info(`[RoomManager] Player Login: ${creds.name} -> ${creds.data}`);
+        if (!!rm) {
+            rm.onPlayerLogin(player);
+            player.getSocket().on(SocketEvent.DISCONNECT, () => rm.onPlayerLeave(player));
+            this.onSocketConnect(socket);
+        } else {
+            Logger.Warn(`[RoomManager] Cannot found room for: ${creds.data}`);
+            socket.disconnect();
+        }
+    }
+
+    public onRoomLogin(socket: Socket, creds: ILoginCreds) {
+        if (Object.values(this.rooms).find((r) => (r.getRoomName() === creds.name))) {
+            Logger.Warn('[RoomManager] Duplicate Room Creation Requested, kicked');
+            socket.disconnect();
+            return null;
+        }
+        try {
+            this.rooms[socket.id] = new Room(creds.data, creds.name, socket);
+            this.onSocketConnect(socket);
+        } catch (e) {
+            Logger.Warn(`[RoomManager] Failed to create room with game: ${e}`);
+            socket.disconnect();
+            return;
+        }
+        Logger.Info(`[RoomManager] New Room Created ${creds.name} : ${creds.data}`);
     }
 
     private onDisconnect(socket: Socket) {
@@ -37,50 +63,6 @@ export class RoomManager {
             return;
         }
         Logger.Info(`[RoomManager] SocketIO Client Disconnected: ${socket.id}`);
-    }
-
-    private onLogin(socket: Socket, creds: ILoginCreds) {
-        if (RoomManager.verifyCredential(creds)) {
-            switch (creds.type) {
-                case ConnectType.SCREEN:
-                    this.createRoom(creds, socket);
-                    break;
-                case ConnectType.CONTROLLER:
-                    const rm = Object.values(this.rooms).find((room) => room.getRoomName() === creds.data);
-                    const player = new PlayerController(creds.name, socket);
-                    Logger.Info(`[RoomManager] Player Login: ${creds.name} -> ${creds.data}`);
-                    if (!!rm) {
-                        rm.onPlayerLogin(player);
-                    } else {
-                        Logger.Warn(`[RoomManager] Cannot found room for: ${creds.data}`);
-                        socket.disconnect();
-                    }
-                    break;
-                default:
-                    Logger.Warn(`[RoomManager] Invalid login type ${creds.type}`);
-                    socket.disconnect();
-                    break;
-            }
-        } else {
-            Logger.Warn(`[RoomManager] Invalid login creds: ${creds}`);
-            socket.disconnect();
-        }
-    }
-
-    public createRoom(creds: ILoginCreds, socket: Socket) {
-        if (Object.values(this.rooms).find((r) => (r.getRoomName() === creds.name))) {
-            Logger.Warn('[RoomManager] Duplicate Room Creation Requested, kicked');
-            socket.disconnect();
-            return null;
-        }
-        try {
-            this.rooms[socket.id] = new Room(creds.data, creds.name, socket);
-        } catch (e) {
-            Logger.Warn(`[RoomManager] Failed to create room with game: ${e}`);
-            socket.disconnect();
-            return;
-        }
-        Logger.Info(`[RoomManager] New Room Created ${creds.name} : ${creds.data}`);
     }
 
     public findRoomByPlayerId(playerId: string): Room | undefined {
