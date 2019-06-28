@@ -174,7 +174,7 @@ export class BlackJack implements IGame {
         Logger.Info(`[BlackJack] Player Leave Game : ${player.name}`);
         if (this.currentStage === STAGE_ASK) {
             const askStage = this.stages[this.currentStage] as AskStage;
-            if (!!askStage && askStage.getCurrentTUrn() === player.getId()) {
+            if (!!askStage && askStage.getCurrentTurn() === player.getId()) {
                 askStage.nextBetPlayer();
             }
         }

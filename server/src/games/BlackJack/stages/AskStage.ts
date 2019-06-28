@@ -116,7 +116,7 @@ export class AskStage implements IStage {
         return;
     }
 
-    public getCurrentTUrn(): string {
+    public getCurrentTurn(): string {
         return this.turn;
     }
 
