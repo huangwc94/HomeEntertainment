@@ -1,12 +1,13 @@
-import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, IStage, STAGE_DISTRIBUTE} from '../index';
+import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction , STAGE_DISTRIBUTE} from '../index';
 import {Logger} from '@overnightjs/logger';
+import {StageSystem, IStage} from '../../../components/StageSystem';
 
 export const START_BET = '请下注';
 export const BET_MAXIMUM = 300;
 
 export class BetStage implements IStage {
 
-    constructor(private game: BlackJack) {
+    constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
 
     }
 
@@ -29,7 +30,7 @@ export class BetStage implements IStage {
             Logger.Info(`[BetStage]Player ${this.game.players[playerIndex].name} confirm bet`);
             if (Object.values(this.game.players).every((p) => p.isCompleteBet() || !p.haveChip())) {
                 Logger.Info(`[BetStage]All player bet!`);
-                this.game.setStage(STAGE_DISTRIBUTE);
+                this.stageSystem.changeStage(STAGE_DISTRIBUTE);
             }
         }
     }

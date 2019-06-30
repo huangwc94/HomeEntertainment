@@ -10,6 +10,7 @@ import {DealStage} from './stages/DealStage';
 import {AskStage} from './stages/AskStage';
 import {EndStage} from './stages/EndStage';
 import {DistributeStage} from './stages/DistributeStage';
+import {StageSystem} from '../../components/StageSystem';
 
 
 export const STAGE_START = 'START';
@@ -33,21 +34,6 @@ export interface IBlackJackPlayerAction {
     data: any;
 }
 
-
-export interface IStage {
-    handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void;
-
-    stageStart(): void;
-
-    stageEnd(): void;
-
-    tick(): void;
-
-    getPromotion(): string;
-
-    endCountDown(): void;
-}
-
 interface IBlackJackGameState {
     playing: boolean;
     players: IBlackJackPlayerState[];
@@ -68,33 +54,32 @@ export class BlackJack implements IGame {
 
     public playing: boolean;
 
-    public countDown: number;
-
     public poker: Poker;
 
     public playerTurn: number;
 
-    public stages: { [id: string]: IStage };
-
-    public currentStage: string;
+    private readonly stageSystem: StageSystem<BlackJack>;
 
     constructor(public room: Room) {
         this.playing = false;
         this.players = {};
         this.poker = new Poker(6);
         this.dealerHand = [];
-        this.countDown = -1;
         this.playerTurn = 0;
-        this.stages = {
-            [STAGE_START]: new StartStage(this),
-            [STAGE_BET]: new BetStage(this),
-            [STAGE_DISTRIBUTE]: new DistributeStage(this),
-            [STAGE_ASK]: new AskStage(this),
-            [STAGE_DEAL]: new DealStage(this),
-            [STAGE_END]: new EndStage(this),
+        this.stageSystem = new StageSystem<BlackJack>(
+            this,
+            () => this.room.broadcastFullUpdate(),
+            () => this.room.broadcastFullUpdate(),
+        );
+        this.stageSystem.stages = {
+            [STAGE_START]: new StartStage(this, this.stageSystem),
+            [STAGE_BET]: new BetStage(this, this.stageSystem),
+            [STAGE_DISTRIBUTE]: new DistributeStage(this, this.stageSystem),
+            [STAGE_ASK]: new AskStage(this, this.stageSystem),
+            [STAGE_DEAL]: new DealStage(this, this.stageSystem),
+            [STAGE_END]: new EndStage(this, this.stageSystem),
         };
-
-        this.currentStage = STAGE_START;
+        this.stageSystem.currentStage = STAGE_START;
     }
 
     private static castAction(action: any): IBlackJackPlayerAction | null {
@@ -124,6 +109,8 @@ export class BlackJack implements IGame {
     public getRoomConfig(): IRoomConfig {
         return {
             tickFrequency: 1000,
+            numberOfPlayerAllow: 5,
+            gameName: 'BlackJack',
         };
     }
 
@@ -166,14 +153,12 @@ export class BlackJack implements IGame {
     }
 
     public onPlayerEnter(player: PlayerController): void {
-        Logger.Info(`[BlackJack] Player Join Game : ${player.name}`);
         this.players[player.getId()] = new BlackJackPlayer(player.getId(), player.name, player.cash);
     }
 
     public onPlayerLeave(player: PlayerController): void {
-        Logger.Info(`[BlackJack] Player Leave Game : ${player.name}`);
-        if (this.currentStage === STAGE_ASK) {
-            const askStage = this.stages[this.currentStage] as AskStage;
+        if (this.stageSystem.currentStage === STAGE_ASK) {
+            const askStage = this.stageSystem.getCurrentStage() as AskStage;
             if (!!askStage && askStage.getCurrentTurn() === player.getId()) {
                 askStage.nextBetPlayer();
             }
@@ -183,22 +168,8 @@ export class BlackJack implements IGame {
         delete this.players[player.getId()];
     }
 
-    public getGameName(): string {
-        return 'BlackJack';
-    }
-
-    private getCurrentStage(): IStage | null {
-        return this.currentStage in this.stages ? this.stages[this.currentStage] : null;
-    }
-
     private getPromote(): string {
-        const stage: IStage | null = this.getCurrentStage();
-
-        if (!!stage) {
-            return stage.getPromotion();
-        }
-
-        return '';
+        return this.stageSystem.getPromotion();
     }
 
     public getGameState(): IBlackJackGameState {
@@ -207,33 +178,12 @@ export class BlackJack implements IGame {
             players: Object.values(this.players).map((p) => p.getState()),
             dealHand: this.dealerHand,
             dealValue: BlackJack.handValue(this.dealerHand),
-            countDown: this.countDown,
-            stage: this.currentStage,
+            countDown: this.stageSystem.countDown,
+            stage: this.stageSystem.currentStage,
             playerTurn: this.playerTurn,
             promotion: this.getPromote(),
             cardLeft: this.poker.card_left(),
         };
-    }
-
-    public endStage(stageName?: string) {
-        const name = stageName || this.currentStage;
-        if (name in this.stages) {
-            Logger.Info(`[BlackJack] Stage end: ${name}`);
-            this.stages[name].stageEnd();
-            this.countDown = -1;
-            this.room.broadcastFullUpdate();
-        }
-    }
-
-    public setStage(stageName: string) {
-        if (this.currentStage in this.stages) {
-            this.endStage(this.currentStage);
-            Logger.Info(`[BlackJack] Stage change to: ${stageName}`);
-            this.currentStage = stageName;
-            Logger.Info(`[BlackJack] Stage start: ${stageName}`);
-            this.stages[this.currentStage].stageStart();
-            this.room.broadcastFullUpdate();
-        }
     }
 
     public handlePlayerInput(player: PlayerController, action: any): void {
@@ -241,13 +191,12 @@ export class BlackJack implements IGame {
         const blackjackAction = BlackJack.castAction(action);
         if (!!blackjackAction) {
             Logger.Info(`[BlackJack] Player Input Received ${player.name}: ${blackjackAction.type} ${blackjackAction.data}`);
-            this.stages[this.currentStage].handlePlayerInput(playerIndex, blackjackAction);
+            this.stageSystem.getCurrentStage().handlePlayerInput(playerIndex, blackjackAction);
         }
     }
 
     public end(): void {
-        this.endStage();
-        this.room.broadcastFullUpdate();
+        this.stageSystem.endStage();
         Logger.Info(`[BlackJack] Game End!`);
     }
 
@@ -255,27 +204,14 @@ export class BlackJack implements IGame {
         return this.playing;
     }
 
-    public tick(): void {
-        const stage: IStage | null = this.getCurrentStage();
-        if (!!stage) {
-            stage.tick();
-            if (this.countDown > 0) {
-                this.countDown -= 1;
-            } else if (this.countDown === 0) {
-                this.countDown = -1;
-                stage.endCountDown();
-            }
-            this.room.broadcastFullUpdate();
-        }
+    public tick(delta: number): void {
+        this.stageSystem.tick();
     }
 
     public start(): void {
         Logger.Info(`[BlackJack] Game Start!`);
         this.playing = true;
-        this.setStage(STAGE_START);
-    }
-
-    public numberOfPlayerAllow(): number {
-        return 5;
+        this.stageSystem.currentStage = STAGE_START;
+        this.stageSystem.startStage();
     }
 }

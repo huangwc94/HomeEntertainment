@@ -1,7 +1,7 @@
-import {IBlackJackPlayerAction, IStage, BlackJackPlayerActionType, BlackJack, STAGE_END} from '../index';
+import {IBlackJackPlayerAction, BlackJack, STAGE_END} from '../index';
 import {ICard} from '../../../components/Poker';
-import {WAIT_OTHER} from '../components/BlackJackPlayer';
 import {Logger} from '@overnightjs/logger';
+import {StageSystem, IStage} from '../../../components/StageSystem';
 
 const DEALER_TURN = '庄家操作';
 
@@ -11,7 +11,7 @@ export interface IPlayerPosition {
 }
 
 export class DealStage implements IStage {
-    constructor(private game: BlackJack) {
+    constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
 
     }
 
@@ -32,13 +32,13 @@ export class DealStage implements IStage {
         Logger.Info(`[DealStage] Dealer Hand Value: ${handleValue}`);
         if (handleValue >= 21) {
             Logger.Info(`[DealStage] Dealer Busted`);
-            this.game.setStage(STAGE_END);
+            this.stageSystem.changeStage(STAGE_END);
             return;
         }
 
         if (handleValue >= 17) {
             Logger.Info(`[DealStage] Dealer done hit`);
-            this.game.setStage(STAGE_END);
+            this.stageSystem.changeStage(STAGE_END);
         } else {
             const card: ICard | null = this.game.poker.randomGet();
             if (!!card) {

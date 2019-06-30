@@ -1,22 +1,24 @@
-import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, IStage, STAGE_DEAL, STAGE_END,} from '../index';
+import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DEAL, STAGE_END} from '../index';
 import {BlackJackPlayer, BUSTED} from '../components/BlackJackPlayer';
 import {ICard} from '../../../components/Poker';
 import {Logger} from '@overnightjs/logger';
-import {NotificationType} from '../../../network';
+import {IInputAction, NotificationType} from '../../../network';
+import {StageSystem, IStage, IStageWithInputHandler} from '../../../components/StageSystem';
+import {PlayerController} from '../../../core/PlayerController';
 
 export const PLAYER_TURN = '等待 {0} 要牌';
 export const DISPATCH_CARD = '等待发牌';
 
-export class AskStage implements IStage {
+export class AskStage implements IStageWithInputHandler {
 
     private turn: string;
 
-    constructor(private game: BlackJack) {
+    constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
         this.turn = '';
-
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void {
+    public handlePlayerInput(player: PlayerController, action: IInputAction): void {
+        const playerIndex = player.getId();
         if (playerIndex !== this.turn) {
             Logger.Warn(`[AskStage] Receive action from wrong player: ${playerIndex} ${this.turn}`);
             return;
@@ -135,12 +137,11 @@ export class AskStage implements IStage {
         } else {
             if (Object.values(this.game.players).every((p) => p.inFinalState())) {
                 Logger.Info(`[AskStage]All bet player busted or black jacked!`);
-                this.game.setStage(STAGE_END);
+                this.stageSystem.changeStage(STAGE_END);
             } else {
                 Logger.Info(`[AskStage]All bet player complete round!`);
-                this.game.setStage(STAGE_DEAL);
+                this.stageSystem.changeStage(STAGE_DEAL);
             }
-
         }
     }
 }

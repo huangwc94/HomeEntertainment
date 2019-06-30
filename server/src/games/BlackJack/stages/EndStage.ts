@@ -1,7 +1,8 @@
-import {BlackJack, IStage, IBlackJackPlayerAction, STAGE_START} from '../index';
+import {BlackJack, IBlackJackPlayerAction, STAGE_START} from '../index';
 
 import {Logger} from '@overnightjs/logger';
 import {ICard} from '../../../components/Poker';
+import {StageSystem, IStage} from '../../../components/StageSystem';
 
 const ROUND_END = '本局结束';
 
@@ -9,7 +10,7 @@ export class EndStage implements IStage {
 
     private completeCalculation: boolean;
 
-    constructor(private game: BlackJack) {
+    constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
         this.completeCalculation = false;
     }
 
@@ -49,7 +50,7 @@ export class EndStage implements IStage {
                 player.lost();
             }
         } else {
-            this.game.countDown = 5;
+            this.stageSystem.countDown = 5;
             this.completeCalculation = true;
             Logger.Info(`[EndStage] Calculation Done!`);
         }
@@ -60,6 +61,6 @@ export class EndStage implements IStage {
     }
 
     public endCountDown(): void {
-        this.game.setStage(STAGE_START);
+        this.stageSystem.changeStage(STAGE_START);
     }
 }

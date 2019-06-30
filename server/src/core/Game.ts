@@ -7,8 +7,6 @@ export interface IGame {
 
     getRoomConfig(): IRoomConfig;
 
-    getGameName(): string;
-
     getGameState(): any;
 
     onPlayerEnter(player: PlayerController): void;
@@ -23,7 +21,5 @@ export interface IGame {
 
     isPlaying(): boolean;
 
-    numberOfPlayerAllow(): number;
-
-    tick(): void;
+    tick(delta: number): void;
 }

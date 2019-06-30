@@ -4,9 +4,6 @@
  * created by Weicheng Huang
  */
 
-import {ConnectType, ILoginCreds, SocketEvent} from './network';
-import {Socket} from 'socket.io';
-import {Logger} from '@overnightjs/logger';
 import {Room} from './core/Room';
 import {IPlayerControllerState, PlayerController} from './core/PlayerController';
 
@@ -20,13 +17,6 @@ interface IPlayerRoomMapping {
     [id: string]: Room;
 }
 
-export interface IPlayerMapping {
-    [id: string]: PlayerController;
-}
-
-export interface IPlayerStateMapping {
-    [id: string]: IPlayerControllerState;
-}
 
 
 class HomeEntertainmentServer {

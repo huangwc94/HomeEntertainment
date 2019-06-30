@@ -1,24 +1,19 @@
 import {
     IBlackJackPlayerAction,
-    IStage,
     BlackJack,
     STAGE_ASK, STAGE_END,
 } from '../index';
-import {
-    ALREADY_BET,
-    INITIAL_BLACK_JACK, PLAYER_WIN,
-    WAIT_ASK,
-    WAIT_OTHER,
-} from '../components/BlackJackPlayer';
+import {INITIAL_BLACK_JACK} from '../components/BlackJackPlayer';
 import {ICard} from '../../../components/Poker';
 import {Logger} from '@overnightjs/logger';
+import {StageSystem, IStage} from '../../../components/StageSystem';
 
 
 export const DISPATCH_CARD = '正在发牌';
 
 export class DistributeStage implements IStage {
 
-    constructor(private game: BlackJack) {
+    constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
 
     }
 
@@ -40,10 +35,10 @@ export class DistributeStage implements IStage {
         if (turn === 2) {
             if (Object.values(this.game.players).every((p) => p.inFinalState())) {
                 Logger.Info(`[DistributeStage]All bet player win!`);
-                this.game.setStage(STAGE_END);
+                this.stageSystem.changeStage(STAGE_END);
             } else {
                 Logger.Info(`[DistributeStage]All bet player complete round!`);
-                this.game.setStage(STAGE_ASK);
+                this.stageSystem.changeStage(STAGE_ASK);
             }
             return;
         }
@@ -63,7 +58,7 @@ export class DistributeStage implements IStage {
                 if (this.game.dealerHand.length === 2) {
                     if (BlackJack.handValue(this.game.dealerHand, true) === 21) {
                         this.game.dealerHand.forEach((c: ICard) => c.show = true);
-                        this.game.setStage(STAGE_END);
+                        this.stageSystem.changeStage(STAGE_END);
                     } else {
                         Object.values(this.game.players).forEach((p) => {
                             if (p.state === INITIAL_BLACK_JACK) {

@@ -1,26 +1,35 @@
 import {IPlayerControllerState, PlayerController} from './PlayerController';
 import {IGame} from './Game';
-import {IInputAction, INotification, NotificationType, SocketEvent} from '../network';
+import {IInputAction, NotificationType, SocketEvent} from '../network';
 import {Socket} from 'socket.io';
 import {gameFactory} from '../games';
 import {Logger} from '@overnightjs/logger';
-import {IPlayerMapping, IPlayerStateMapping} from '../HomeEntertainmentServer';
 import Timeout = NodeJS.Timeout;
 
 import * as _ from 'lodash';
 
 export interface IRoomConfig {
     tickFrequency: number;
+    numberOfPlayerAllow: number;
+    gameName: string;
 }
 
 export interface IFullRoomState {
     name: string;
+    game: string;
     players: IPlayerStateMapping;
     gameState: any;
     maxPlayerNumber: number;
     isStarted: boolean;
 }
 
+export interface IPlayerMapping {
+    [id: string]: PlayerController;
+}
+
+export interface IPlayerStateMapping {
+    [id: string]: IPlayerControllerState;
+}
 
 export class Room {
 
@@ -32,7 +41,9 @@ export class Room {
 
     private readonly config: IRoomConfig;
 
-    public tickHandle: Timeout | null;
+    private tickHandle: Timeout | null;
+
+    private lastTickTime: number;
 
     constructor(private gameType: string, private roomName: string, private socket: Socket) {
         this.players = {};
@@ -40,6 +51,7 @@ export class Room {
         this.config = this.game.getRoomConfig();
         this.prevFullState = null;
         this.tickHandle = null;
+        this.lastTickTime = +new Date();
         this.broadcastFullUpdate();
     }
 
@@ -53,7 +65,7 @@ export class Room {
 
     public onPlayerLogin(player: PlayerController) {
 
-        if (this.game.isPlaying() || this.game.numberOfPlayerAllow() < Object.keys(this.players).length) {
+        if (this.game.isPlaying() || this.config.numberOfPlayerAllow < Object.keys(this.players).length) {
             Logger.Warn(`[Room] Cannot join new player as room reach maximum occupancy`);
             player.disconnect();
             return;
@@ -107,7 +119,9 @@ export class Room {
     }
 
     public tick() {
-        this.game.tick();
+        const thisTickTime = + new Date();
+        this.lastTickTime = thisTickTime;
+        this.game.tick(thisTickTime - this.lastTickTime);
         this.broadcastFullUpdate();
     }
 
@@ -146,9 +160,10 @@ export class Room {
     public getFullRoomState(): IFullRoomState {
         return {
             name: this.roomName,
+            game: this.config.gameName,
             players: this.getPlayerStates(),
             gameState: this.game.getGameState(),
-            maxPlayerNumber: this.game.numberOfPlayerAllow(),
+            maxPlayerNumber: this.config.numberOfPlayerAllow,
             isStarted: this.game.isPlaying(),
         };
     }
