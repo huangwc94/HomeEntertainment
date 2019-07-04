@@ -3,9 +3,7 @@ import {Server} from 'http';
 import * as bodyParser from 'body-parser';
 import {WechatController} from '../controllers';
 import {AdminController} from '../controllers/AdminController';
-
-import * as path from 'path';
-import {Logger} from "@overnightjs/logger";
+import {Logger} from '@overnightjs/logger';
 
 
 export class WebServer {

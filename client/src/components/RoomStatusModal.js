@@ -77,14 +77,13 @@ function generateList(players) {
 }
 
 export default function RoomStatusModal(props) {
-
-    const {remote, open, back, connected, gameName, roomName} = props;
+    const {remote, back, connected, gameName, roomName} = props;
     const {name, players, maxPlayerNumber} = remote;
     const classes = useStyles();
     const connectionString = process.env.NODE_ENV === 'development' ? ServerAddress + "/controller/" + name + "/" + gameName : `${WechatRedirectUrl}${roomName}!${gameName}`;
     const [modalStyle] = React.useState(getModalStyle);
     return (
-        <Modal open={open}>
+        <Modal open={true}>
             {connected ?
                 <div style={modalStyle} className={classes.paper}>
                     <IconButton className={classes.button} aria-label="Delete" onClick={() => back()}>
@@ -114,3 +113,4 @@ export default function RoomStatusModal(props) {
         </Modal>
     );
 }
+

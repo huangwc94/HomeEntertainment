@@ -2,9 +2,7 @@ import {Server} from 'http';
 import {Socket} from 'socket.io';
 import {Logger} from '@overnightjs/logger';
 import {RoomManager} from './RoomManager';
-import {ConnectType, ILoginCreds, SocketEvent} from '../network';
-import {PlayerController} from './PlayerController';
-
+import {ConnectType, ILoginCredential, SocketEvent} from '../network';
 
 export class SocketServer {
     private io: Server;
@@ -16,12 +14,12 @@ export class SocketServer {
     public start() {
         this.io.on(SocketEvent.CONNECT, (socket: Socket) => {
             RoomManager.getInstance().onSocketConnect(socket);
-            socket.on(SocketEvent.CLIENT_LOGIN, (creds: ILoginCreds) => SocketServer.onLogin(socket, creds));
+            socket.on(SocketEvent.CLIENT_LOGIN, (creds: ILoginCredential) => SocketServer.onLogin(socket, creds));
             Logger.Info(`[SocketServer] SocketIO Client Connected: ${socket.id}`);
         });
     }
 
-    private static onLogin(socket: Socket, creds: ILoginCreds) {
+    private static onLogin(socket: Socket, creds: ILoginCredential) {
         if (SocketServer.verifyCredential(creds)) {
             switch (creds.type) {
                 case ConnectType.SCREEN:
@@ -41,7 +39,7 @@ export class SocketServer {
         }
     }
 
-    private static verifyCredential(creds: ILoginCreds): boolean {
+    private static verifyCredential(creds: ILoginCredential): boolean {
         return true;
     }
 }

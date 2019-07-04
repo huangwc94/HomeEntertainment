@@ -2,6 +2,8 @@ import {IBlackJackPlayerAction, BlackJack, STAGE_END} from '../index';
 import {ICard} from '../../../components/Poker';
 import {Logger} from '@overnightjs/logger';
 import {StageSystem, IStage} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
+import {IInputAction} from '../../../network';
 
 const DEALER_TURN = '庄家操作';
 
@@ -15,7 +17,7 @@ export class DealStage implements IStage {
 
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void {
+    public handlePlayerInput(player: Player, action: IInputAction): void {
         return;
     }
 

@@ -1,17 +1,18 @@
-import {BlackJack, IBlackJackPlayerAction, STAGE_BET} from '../index';
+import {BlackJack, STAGE_BET} from '../index';
 import {IStage, StageSystem} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
+import {IInputAction} from '../../../network';
 
 export const WAIT_START = '等待游戏开始...';
 
 export class StartStage implements IStage {
 
-
     constructor(private game: BlackJack, private stageSystem: StageSystem<BlackJack>) {
 
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void {
-
+    public handlePlayerInput(player: Player, action: IInputAction): void {
+        return;
     }
 
     public tick(): void {

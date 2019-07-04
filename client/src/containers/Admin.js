@@ -19,7 +19,6 @@ const PasswordPrompt = (props) => {
 
     const valueChange = (value) => {
         password = value.target.value;
-        console.log(password);
     };
 
     return (

@@ -1,4 +1,4 @@
-import {IPlayerControllerState, PlayerController} from './PlayerController';
+import {IPlayerState, Player} from './Player';
 import {IGame} from './Game';
 import {IInputAction, NotificationType, SocketEvent} from '../network';
 import {Socket} from 'socket.io';
@@ -12,6 +12,7 @@ export interface IRoomConfig {
     tickFrequency: number;
     numberOfPlayerAllow: number;
     gameName: string;
+    shareGamePlayerState: boolean;
 }
 
 export interface IFullRoomState {
@@ -24,11 +25,11 @@ export interface IFullRoomState {
 }
 
 export interface IPlayerMapping {
-    [id: string]: PlayerController;
+    [id: string]: Player;
 }
 
 export interface IPlayerStateMapping {
-    [id: string]: IPlayerControllerState;
+    [id: string]: IPlayerState;
 }
 
 export class Room {
@@ -63,7 +64,7 @@ export class Room {
         return this.roomName;
     }
 
-    public onPlayerLogin(player: PlayerController) {
+    public onPlayerLogin(player: Player) {
 
         if (this.game.isPlaying() || this.config.numberOfPlayerAllow < Object.keys(this.players).length) {
             Logger.Warn(`[Room] Cannot join new player as room reach maximum occupancy`);
@@ -78,7 +79,7 @@ export class Room {
         }
 
         Logger.Info(`[Room]New Player Join Room ${player.name} -> ${this.roomName}`);
-        this.players[player.getId()] = player;
+        this.players[player.id] = player;
         this.bindEvent(player);
         this.game.onPlayerEnter(player);
         this.broadcastFullUpdate();
@@ -88,13 +89,13 @@ export class Room {
         return Object.values(this.players).every((p) => p.ready) && Object.keys(this.players).length > 0;
     }
 
-    private bindEvent(player: PlayerController) {
-        player.getSocket().on(SocketEvent.CLIENT_ACTION, (action: IInputAction) => {
+    private bindEvent(player: Player) {
+        player.socket.on(SocketEvent.CLIENT_ACTION, (action: IInputAction) => {
             Logger.Info(`[Room]Player Action Received ${player.name} : ${action}`);
             this.game.handlePlayerInput(player, action);
             this.broadcastFullUpdate();
         });
-        player.getSocket().on(SocketEvent.CLIENT_READY, () => {
+        player.socket.on(SocketEvent.CLIENT_READY, () => {
             player.ready = true;
             Logger.Info(`[Room]Player Ready ${player.name}`);
             if (this.isAllReady()) {
@@ -119,7 +120,7 @@ export class Room {
     }
 
     public tick() {
-        const thisTickTime = + new Date();
+        const thisTickTime = +new Date();
         this.lastTickTime = thisTickTime;
         this.game.tick(thisTickTime - this.lastTickTime);
         this.broadcastFullUpdate();
@@ -133,11 +134,11 @@ export class Room {
         this.broadcastFullUpdate();
     }
 
-    public onPlayerLeave(player: PlayerController) {
-        if (player.getId() in this.players) {
+    public onPlayerLeave(player: Player) {
+        if (player.id in this.players) {
             Logger.Info(`[Room]Player Leave ${player.name}`);
             this.game.onPlayerLeave(player);
-            delete this.players[player.getId()];
+            delete this.players[player.id];
             if (Object.keys(this.players).length === 0 && this.game.isPlaying()) {
                 this.socket.disconnect();
                 Logger.Info(`[Room]All player Leave, kick room socket!`);
@@ -152,7 +153,7 @@ export class Room {
     public getPlayerStates(): IPlayerStateMapping {
         const res: IPlayerStateMapping = {};
         Object.values(this.players).forEach((p) => {
-            res[p.getId()] = p.getState();
+            res[p.id] = p.getState();
         });
         return res;
     }
@@ -168,14 +169,29 @@ export class Room {
         };
     }
 
+    public getPlayerRoomState(playerId: string): IFullRoomState {
+        const state = this.getFullRoomState();
+
+        if (!this.config.shareGamePlayerState) {
+            Object.values(state.players).forEach((player) => {
+                if (player.id !== playerId) {
+                    player.gamePlayerState = {};
+                }
+            });
+        }
+
+        return state;
+    }
+
     public broadcastFullUpdate() {
         const state = this.getFullRoomState();
         if (_.isEqual(this.prevFullState, state)) {
             return;
         }
         this.socket.emit(SocketEvent.SERVER_FULL_STATE_UPDATE, state);
-        Object.values(this.players).map((player) => {
-            player.send(SocketEvent.SERVER_FULL_STATE_UPDATE, state);
+        Object.values(this.players).forEach((player) => {
+            const playerState = this.getPlayerRoomState(player.id);
+            player.send(SocketEvent.SERVER_FULL_STATE_UPDATE, playerState);
         });
         this.prevFullState = state;
     }
@@ -191,7 +207,7 @@ export class Room {
     public sendPlayerNotification(playerId: string, type: NotificationType, message: string) {
 
         if (!!this.players[playerId]) {
-            this.players[playerId].getSocket().emit(SocketEvent.NOTIFICATION, {type, message});
+            this.players[playerId].socket.emit(SocketEvent.NOTIFICATION, {type, message});
         }
     }
 

@@ -1,5 +1,3 @@
-import {Server} from 'socket.io';
-
 export enum SocketEvent {
     SERVER_FULL_STATE_UPDATE = 'SERVER_UPDATE',
     SERVER_ACTION = 'SERVER_ACTION',
@@ -28,7 +26,7 @@ export interface INotification {
     message: string;
 }
 
-export interface ILoginCreds {
+export interface ILoginCredential {
     name: string;
     token: string;
     type: ConnectType;
@@ -38,16 +36,5 @@ export interface ILoginCreds {
 export interface IInputAction {
     type: string;
     payload: any;
-}
-
-let _socketServer: Server;
-
-
-export function GetSocketServer() {
-    return _socketServer;
-}
-
-export function SetSocketServer(server: Server) {
-    _socketServer = server;
 }
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
 import Input from '@material-ui/core/Input';
-import IO from 'socket.io-client';
+
 import './Controller.css';
 import DoneIcon from '@material-ui/icons/Done';
 import ErrorIcon from '@material-ui/icons/Error';
-import {ServerAddress} from "../network";
+import {sendReady} from "../network";
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
@@ -15,23 +15,15 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import * as queryString from 'query-string'
 
+import {connect} from "react-redux";
+import {connectToServer} from "../network";
+
 class Controller extends React.Component {
 
     playerName;
 
     constructor(props) {
         super(props);
-        this.state = {
-            playing: false,
-            connected: false,
-            remote: {
-                name: '',
-                players: [],
-                gameState: {},
-                maxPlayerNumber: 0,
-                isStarted: false
-            }
-        };
     }
 
     generateList = (players) => {
@@ -69,18 +61,7 @@ class Controller extends React.Component {
     };
 
     connect = (name, room) => {
-        this.io = new IO(ServerAddress);
-        this.io.on('connect', () => {
-            this.io.emit('CLIENT_LOGIN', {type: 1, name: name, data: room, token: 111});
-            this.setState({playing: false, connected: true});
-            this.io.on('SERVER_UPDATE', (data) => {
-                const playing = data.isStarted;
-                this.setState({remote: data, playing});
-            });
-        });
-        this.io.on('disconnect', () => {
-            this.setState({connected: false, playing: false});
-        });
+        connectToServer( {type: 1, name: name, data: room, token: 111});
     };
 
     onEnterClick = () => {
@@ -96,15 +77,7 @@ class Controller extends React.Component {
     };
 
     onReady = () => {
-        if (!!this.io) {
-            this.io.emit('CLIENT_READY');
-        }
-    };
-
-    onSendAction = (payload) => {
-        if (!!this.io) {
-            this.io.emit('CLIENT_ACTION', payload);
-        }
+        sendReady();
     };
 
     renderGame = () => {
@@ -112,7 +85,7 @@ class Controller extends React.Component {
 
         const GameController = ControllerList[game];
 
-        return <GameController state={this.state.remote} send={this.onSendAction} id={this.id}/>;
+        return <GameController id={this.id}/>;
     };
 
     renderForm = () => {
@@ -153,19 +126,19 @@ class Controller extends React.Component {
 
     renderLogin = () => {
         return (
-            this.state.connected ?
+            this.props.connected ?
                 <div className="Controller">
                     <div className="player-ready-container">
                         <h1>准备</h1>
                         <List className='controller-player-list'>
-                            {this.generateList(this.state.remote.players)}
+                            {this.generateList(this.props.remote.players)}
                         </List>
                     </div>
                     <Button className="player-input-button" variant="contained" color="primary"
                             onClick={this.onReady}>就绪</Button>
                 </div>
-                :
-                    this.renderForm()
+            :
+                this.renderForm()
         );
     };
 
@@ -173,9 +146,9 @@ class Controller extends React.Component {
         return (
             <div>
                 {
-                    this.state.playing ?
+                    this.props.remote.isStarted ?
                         this.renderGame()
-                        :
+                    :
                         this.renderLogin()
                 }
             </div>
@@ -183,4 +156,8 @@ class Controller extends React.Component {
     }
 }
 
-export default Controller;
+const mapState = (state) => ({
+    ...state
+});
+
+export default connect(mapState)(Controller);

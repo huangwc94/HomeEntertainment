@@ -1,6 +1,8 @@
-import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction , STAGE_DISTRIBUTE} from '../index';
+import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DISTRIBUTE} from '../index';
 import {Logger} from '@overnightjs/logger';
 import {StageSystem, IStage} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
+import {IInputAction} from '../../../network';
 
 export const START_BET = '请下注';
 export const BET_MAXIMUM = 300;
@@ -11,12 +13,14 @@ export class BetStage implements IStage {
 
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void {
+    public handlePlayerInput(player: Player, action: IInputAction): void {
+
+        const playerIndex = player.id;
 
         if (action.type === BlackJackPlayerActionType.PlayerAddChip) {
-            if (action.data > 0 && this.game.players[playerIndex].canBet() && this.game.players[playerIndex].bet.getCashValue() + action.data <= BET_MAXIMUM) {
-                this.game.players[playerIndex].addBet(action.data);
-                Logger.Info(`[BetStage]Player ${this.game.players[playerIndex].name} add bet ${action.data}`);
+            if (action.payload > 0 && this.game.players[playerIndex].canBet() && this.game.players[playerIndex].bet.getCashValue() + action.payload <= BET_MAXIMUM) {
+                this.game.players[playerIndex].addBet(action.payload);
+                Logger.Info(`[BetStage]Player ${this.game.players[playerIndex].name} add bet ${action.payload}`);
             }
             return;
         }

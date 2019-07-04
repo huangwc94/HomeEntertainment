@@ -3,6 +3,8 @@ import {BlackJack, IBlackJackPlayerAction, STAGE_START} from '../index';
 import {Logger} from '@overnightjs/logger';
 import {ICard} from '../../../components/Poker';
 import {StageSystem, IStage} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
+import {IInputAction} from '../../../network';
 
 const ROUND_END = '本局结束';
 
@@ -14,7 +16,8 @@ export class EndStage implements IStage {
         this.completeCalculation = false;
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction, data?: any): void {
+    public handlePlayerInput(player: Player, action: IInputAction): void {
+        return;
     }
 
     public stageStart(): void {

@@ -1,13 +1,12 @@
 import {Room} from './Room';
 import {Socket} from 'socket.io';
-import {ConnectType, ILoginCreds, SocketEvent} from '../network';
+import {ILoginCredential, SocketEvent} from '../network';
 import {Logger} from '@overnightjs/logger';
-import {PlayerController} from './PlayerController';
+import {Player} from './Player';
 
 export interface IRoomMapping {
     [socketId: string]: Room;
 }
-
 
 export class RoomManager {
 
@@ -23,13 +22,13 @@ export class RoomManager {
         socket.on(SocketEvent.DISCONNECT, () => this.onDisconnect(socket));
     }
 
-    public onPlayerLogin(socket: Socket, creds: ILoginCreds) {
+    public onPlayerLogin(socket: Socket, creds: ILoginCredential) {
         const rm = Object.values(this.rooms).find((room) => room.getRoomName() === creds.data);
-        const player = new PlayerController(creds.name, socket);
+        const player = new Player(creds.name, socket);
         Logger.Info(`[RoomManager] Player Login: ${creds.name} -> ${creds.data}`);
         if (!!rm) {
             rm.onPlayerLogin(player);
-            player.getSocket().on(SocketEvent.DISCONNECT, () => rm.onPlayerLeave(player));
+            player.socket.on(SocketEvent.DISCONNECT, () => rm.onPlayerLeave(player));
             this.onSocketConnect(socket);
         } else {
             Logger.Warn(`[RoomManager] Cannot found room for: ${creds.data}`);
@@ -37,7 +36,7 @@ export class RoomManager {
         }
     }
 
-    public onRoomLogin(socket: Socket, creds: ILoginCreds) {
+    public onRoomLogin(socket: Socket, creds: ILoginCredential) {
         if (Object.values(this.rooms).find((r) => (r.getRoomName() === creds.name))) {
             Logger.Warn('[RoomManager] Duplicate Room Creation Requested, kicked');
             socket.disconnect();

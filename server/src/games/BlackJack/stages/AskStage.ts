@@ -3,13 +3,13 @@ import {BlackJackPlayer, BUSTED} from '../components/BlackJackPlayer';
 import {ICard} from '../../../components/Poker';
 import {Logger} from '@overnightjs/logger';
 import {IInputAction, NotificationType} from '../../../network';
-import {StageSystem, IStage, IStageWithInputHandler} from '../../../components/StageSystem';
-import {PlayerController} from '../../../core/PlayerController';
+import {StageSystem, IStage} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
 
 export const PLAYER_TURN = '等待 {0} 要牌';
 export const DISPATCH_CARD = '等待发牌';
 
-export class AskStage implements IStageWithInputHandler {
+export class AskStage implements IStage {
 
     private turn: string;
 
@@ -17,15 +17,17 @@ export class AskStage implements IStageWithInputHandler {
         this.turn = '';
     }
 
-    public handlePlayerInput(player: PlayerController, action: IInputAction): void {
-        const playerIndex = player.getId();
+    public handlePlayerInput(player: Player, action: IInputAction): void {
+        const playerIndex = player.id;
         if (playerIndex !== this.turn) {
             Logger.Warn(`[AskStage] Receive action from wrong player: ${playerIndex} ${this.turn}`);
             return;
         }
 
-        const player = this.game.players[playerIndex];
-
+        const gamePlayer = player.gamePlayer as BlackJackPlayer;
+        if (!gamePlayer) {
+            return;
+        }
         switch (action.type) {
             case BlackJackPlayerActionType.PlayerStand:
                 Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Stand`);
@@ -36,33 +38,33 @@ export class AskStage implements IStageWithInputHandler {
                 Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Hit`);
                 const card: ICard | null = this.game.poker.randomGet();
                 if (!!card) {
-                    player.receiveCard(card, false);
+                    gamePlayer.receiveCard(card, false);
                     Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card ${card.suit} ${card.value}`);
 
-                    if (!player.canAsk()) {
-                        if (player.state === BUSTED) {
-                            player.lost();
+                    if (!gamePlayer.canAsk()) {
+                        if (gamePlayer.state === BUSTED) {
+                            gamePlayer.lost();
                         }
-                        Logger.Info(`[AskStage] Player ${player.name} ${player.state}`);
+                        Logger.Info(`[AskStage] Player ${player.name} ${gamePlayer.state}`);
                         this.nextBetPlayer();
                     }
                 }
                 break;
 
             case BlackJackPlayerActionType.PlayerDouble:
-                if (player.hand.length === 2 && player.double()) {
+                if (gamePlayer.hand.length === 2 && gamePlayer.double()) {
                     Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Double`);
                     const c: ICard | null = this.game.poker.randomGet();
                     if (!!c) {
-                        player.receiveCard(c, false);
-                        if (player.state === BUSTED) {
-                            player.lost();
+                        gamePlayer.receiveCard(c, false);
+                        if (gamePlayer.state === BUSTED) {
+                            gamePlayer.lost();
                         }
                         Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card for double ${c.suit} ${c.value}`);
                         this.nextBetPlayer();
                     }
                 } else {
-                    if (player.hand.length > 2) {
+                    if (gamePlayer.hand.length > 2) {
                         this.game.room.sendPlayerNotification(playerIndex, NotificationType.WARNING, '要牌后无法加倍');
                         Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} can not double after hit`);
                     } else {
@@ -74,9 +76,9 @@ export class AskStage implements IStageWithInputHandler {
                 break;
 
             case BlackJackPlayerActionType.PlayerSurrender:
-                if (player.hand.length === 2) {
+                if (gamePlayer.hand.length === 2) {
                     Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Surrender`);
-                    player.surrender();
+                    gamePlayer.surrender();
                     this.nextBetPlayer();
                 } else {
                     this.game.room.sendPlayerNotification(playerIndex, NotificationType.WARNING, '要牌后不能投降！');

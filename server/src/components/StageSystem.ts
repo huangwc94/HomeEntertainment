@@ -1,4 +1,4 @@
-import {PlayerController} from '../core/PlayerController';
+import {Player} from '../core/Player';
 import {IInputAction} from '../network';
 
 export interface IStage {
@@ -11,14 +11,12 @@ export interface IStage {
     getPromotion(): string;
 
     endCountDown(): void;
-}
 
-export interface IStageWithInputHandler extends IStage {
-    handlePlayerInput(player: PlayerController, action: IInputAction): void;
+    handlePlayerInput(player: Player, action: IInputAction): void;
 }
 
 export interface IStageMapping {
-    [stageName: string]: IStage | IStageWithInputHandler;
+    [stageName: string]: IStage;
 }
 
 export class StageSystem<T> {
@@ -88,7 +86,7 @@ export class StageSystem<T> {
         }
     }
 
-    public getCurrentStage(): IStage | IStageWithInputHandler {
+    public getCurrentStage(): IStage {
         return this.stages[this.currentStage];
     }
 
@@ -101,7 +99,6 @@ export class StageSystem<T> {
                 this.countDown = -1;
                 this.getCurrentStage().endCountDown();
             }
-            this.getCurrentStage().tick();
         }
     }
 
@@ -115,5 +112,9 @@ export class StageSystem<T> {
 
     public inValidStage(): boolean {
         return this.currentStage in this.stages;
+    }
+
+    public handlePlayerInput(player: Player, action: IInputAction) {
+        this.getCurrentStage().handlePlayerInput(player, action);
     }
 }

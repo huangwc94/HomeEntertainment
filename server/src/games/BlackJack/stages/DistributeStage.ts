@@ -1,12 +1,14 @@
 import {
-    IBlackJackPlayerAction,
     BlackJack,
-    STAGE_ASK, STAGE_END,
+    STAGE_ASK,
+    STAGE_END,
 } from '../index';
 import {INITIAL_BLACK_JACK} from '../components/BlackJackPlayer';
 import {ICard} from '../../../components/Poker';
 import {Logger} from '@overnightjs/logger';
 import {StageSystem, IStage} from '../../../components/StageSystem';
+import {Player} from '../../../core/Player';
+import {IInputAction} from '../../../network';
 
 
 export const DISPATCH_CARD = '正在发牌';
@@ -17,9 +19,10 @@ export class DistributeStage implements IStage {
 
     }
 
-    public handlePlayerInput(playerIndex: string, action: IBlackJackPlayerAction): void {
+    public handlePlayerInput(player: Player, action: IInputAction): void {
         return;
     }
+
 
     public stageStart(): void {
         Object.values(this.game.players).forEach((p) => p.startDistribute());
@@ -56,6 +59,7 @@ export class DistributeStage implements IStage {
                 this.game.dealerHand.push(card);
                 Logger.Info(`[DistributeStage] Dealer receive card : ${card.suit} ${card.value}`);
                 if (this.game.dealerHand.length === 2) {
+                    card.show = false;
                     if (BlackJack.handValue(this.game.dealerHand, true) === 21) {
                         this.game.dealerHand.forEach((c: ICard) => c.show = true);
                         this.stageSystem.changeStage(STAGE_END);
@@ -67,7 +71,6 @@ export class DistributeStage implements IStage {
                             }
                         });
                     }
-                    card.show = false;
                 }
             }
         }

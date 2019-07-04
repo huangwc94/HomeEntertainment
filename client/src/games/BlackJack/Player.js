@@ -72,8 +72,9 @@ const AnimatedBorder = posed.div({
 
 function Player(props) {
 
-    const {hand, bet, betValue, handValue, state} = props.player;
-    const {name, avatar} = props.roomPlayer;
+    const {name, avatar} = props.player;
+    const {hand, bet, betValue, handValue, state} = props.player.gamePlayerState;
+
 
     const styles = useStyles();
 

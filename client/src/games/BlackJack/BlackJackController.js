@@ -2,9 +2,10 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-
 import ChipStack from '../../components/ChipStack';
 import NameAndAvatar from "../../components/NameAndAvatar";
+import {sendAction} from "../../network";
+import {connect} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -50,41 +51,45 @@ const useStyles = makeStyles(theme => ({
 
 
 
-export default function BlackJackController(props) {
+function BlackJackController(props) {
 
-    const {state, send, id} = props;
+    const {remote, id} = props;
 
     const styles = useStyles();
 
     const addChip = (value) => {
-        if(myStatus().betValue + value > 300){
+        if(gamePlayerStatus().betValue + value > 300){
             alert("最高下注上限为300!");
         }
-        send({type: 'PlayerAddChip', payload: value});
+        sendAction({type: 'PlayerAddChip', payload: value});
     };
 
     const double = () => {
-        send({type: 'PlayerDouble'});
+        sendAction({type: 'PlayerDouble'});
     };
 
     const surrender = () => {
-        send({type: 'PlayerSurrender'});
+        sendAction({type: 'PlayerSurrender'});
     };
 
     const bet = () => {
-        send({type: 'PlayerBet'});
+        sendAction({type: 'PlayerBet'});
     };
 
     const hit = () => {
-        send({type: 'PlayerHit'});
+        sendAction({type: 'PlayerHit'});
     };
 
     const stand = () => {
-        send({type: 'PlayerStand'});
+        sendAction({type: 'PlayerStand'});
     };
 
-    const myStatus = () => {
-        return state.gameState.players.find((p) => p.id === id);
+    const playerStatus = () => {
+        return remote.players[id];
+    };
+
+    const gamePlayerStatus = () => {
+        return playerStatus().gamePlayerState;
     };
 
     const NoAction = () => {
@@ -102,18 +107,18 @@ export default function BlackJackController(props) {
         return (
             <ButtonGroup variant="contained" fullWidth color="primary" className={styles.buttonGroup}>
                 <Button onClick={hit}>要牌</Button>
-                <Button onClick={surrender} disabled={myStatus().hand.length > 2}>投降</Button>
-                <Button onClick={double} disabled={myStatus().betValue > myStatus().chipValue || myStatus().hand.length > 2}>双倍</Button>
+                <Button onClick={surrender} disabled={gamePlayerStatus().hand.length > 2}>投降</Button>
+                <Button onClick={double} disabled={gamePlayerStatus().betValue > gamePlayerStatus().chipValue || gamePlayerStatus().hand.length > 2}>双倍</Button>
                 <Button onClick={stand}>结束</Button>
             </ButtonGroup>
         );
     };
 
     const renderAction = () => {
-        if(state.gameState.stage === 'BET' && myStatus().state !== '已经下注'){
+        if(remote.gameState.stage === 'BET' && gamePlayerStatus().state !== '已经下注'){
             return renderBet();
         }
-        if(state.gameState.stage === 'ASK' && myStatus().state === '正在要牌'){
+        if(remote.gameState.stage === 'ASK' && gamePlayerStatus().state === '正在要牌'){
             return renderAsk();
         }
         return NoAction();
@@ -122,22 +127,22 @@ export default function BlackJackController(props) {
     const ChipValue = [5,25,50,100];
 
     const onStackClick = (index) => {
-        if(myStatus().chips[index] > 0 && myStatus().state === '正在下注') {
+
+        if(gamePlayerStatus().chips[index] > 0 && gamePlayerStatus().state === '正在下注') {
             addChip(ChipValue[index]);
         }
     };
-    console.log(state);
     return (
         <div className={styles.container}>
             <div className={styles.screen}>
-                <NameAndAvatar name={state.players[id].name} avatar={state.players[id].avatar}/>
-                <h2>现金：{myStatus().cash}</h2>
-                <h2>筹码：{myStatus().chipValue}</h2>
-                <h4>{myStatus().state}</h4>
+                <NameAndAvatar name={playerStatus().name} avatar={playerStatus().avatar}/>
+                <h2>现金：{gamePlayerStatus().cash}</h2>
+                <h2>筹码：{gamePlayerStatus().chipValue}</h2>
+                <h4>{gamePlayerStatus().state}</h4>
 
             </div>
             <div className={styles.chipStack}>
-                <ChipStack chips={myStatus().chips} onStackClick={onStackClick} />
+                <ChipStack chips={gamePlayerStatus().chips} onStackClick={onStackClick} />
             </div>
             <div className={styles.actionContainer}>
                 {renderAction()}
@@ -145,3 +150,8 @@ export default function BlackJackController(props) {
         </div>
     );
 }
+
+const mapState = (state) => ({
+    ...state
+});
+export default connect(mapState)(BlackJackController);

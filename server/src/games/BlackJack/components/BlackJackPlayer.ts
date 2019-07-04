@@ -2,6 +2,7 @@ import {ICard} from '../../../components/Poker';
 import {BlackJack} from '../index';
 import {ChipStack, IChipStack, CHIP_VALUES} from '../../../components/ChipStack';
 import {Logger} from '@overnightjs/logger';
+import {IGamePlayer} from '../../../core/Player';
 
 
 // START GAME STATE
@@ -47,7 +48,7 @@ export interface IBlackJackPlayerState {
     id: string;
 }
 
-export class BlackJackPlayer {
+export class BlackJackPlayer implements IGamePlayer{
 
     public hand: ICard[];
 
@@ -184,21 +185,6 @@ export class BlackJackPlayer {
         this.cash = this.chips.evenChip(this.cash);
     }
 
-    public getState(): IBlackJackPlayerState {
-        return {
-            id: this.id,
-            hand: this.hand,
-            name: this.name,
-            cash: this.cash,
-            chips: this.chips.getStack(),
-            chipValue: this.chips.getCashValue(),
-            handValue: BlackJack.handValue(this.hand),
-            bet: this.bet.getStack(),
-            betValue: this.bet.getCashValue(),
-            state: this.state,
-        };
-    }
-
     public canBet(): boolean {
         return [BET_TURN, NOT_ENOUGH_MONEY].includes(this.state);
     }
@@ -225,5 +211,20 @@ export class BlackJackPlayer {
 
     public canAsk(): boolean {
         return this.inRound() && [WAIT_ASK, ASK_TURN].includes(this.state);
+    }
+
+    public getGamePlayerState(): IBlackJackPlayerState {
+        return {
+            id: this.id,
+            hand: this.hand,
+            name: this.name,
+            cash: this.cash,
+            chips: this.chips.getStack(),
+            chipValue: this.chips.getCashValue(),
+            handValue: BlackJack.handValue(this.hand),
+            bet: this.bet.getStack(),
+            betValue: this.bet.getCashValue(),
+            state: this.state,
+        };
     }
 }

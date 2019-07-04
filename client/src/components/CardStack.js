@@ -14,18 +14,29 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Card = posed.div({
+
+    left: {
+        x: -300,
+        y: -200,
+        opacity: 0,
+        transition:{
+            y: 'easeOut',
+        }
+    },
     enter: {
-        y:'0',
+        x:0,
+        y:0,
         opacity: 1,
         transition:{
             y: 'easeIn'
         }
     },
-    exit: {
-        y:'-20vh',
+    right: {
+        x: 300,
+        y: -200,
         opacity: 0,
         transition:{
-            y: 'easeOut'
+            y: 'easeOut',
         }
     },
 });
@@ -38,7 +49,10 @@ function CardStack(props) {
 
     return (
         <div className={styles.container} style={style}>
-            <PoseGroup>
+            <PoseGroup
+                preEnterPose={'right'}
+                exitPose={'left'}
+            >
                 {
                     cards.map(({suit, value, show}, index) => (<Card className={styles.card} style={{zIndex:index +100}} key={index}><PokerCard  value={value} suit={suit} show={show}/></Card>))
                 }

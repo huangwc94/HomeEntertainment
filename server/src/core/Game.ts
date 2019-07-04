@@ -1,4 +1,4 @@
-import {PlayerController} from './PlayerController';
+import {Player} from './Player';
 import {IInputAction} from '../network';
 import {IRoomConfig} from './Room';
 
@@ -9,11 +9,11 @@ export interface IGame {
 
     getGameState(): any;
 
-    onPlayerEnter(player: PlayerController): void;
+    onPlayerEnter(player: Player): void;
 
-    onPlayerLeave(player: PlayerController): void;
+    onPlayerLeave(player: Player): void;
 
-    handlePlayerInput(player: PlayerController, action: IInputAction): void;
+    handlePlayerInput(player: Player, action: IInputAction): void;
 
     start(): void;
 

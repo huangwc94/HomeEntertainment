@@ -1,6 +1,6 @@
-import {BlackJackPlayer, IBlackJackPlayerState} from './components/BlackJackPlayer';
+import {BlackJackPlayer} from './components/BlackJackPlayer';
 import {IGame} from '../../core/Game';
-import {PlayerController} from '../../core/PlayerController';
+import {Player} from '../../core/Player';
 import {IRoomConfig, Room} from '../../core/Room';
 import {ICard, Poker} from '../../components/Poker';
 import {Logger} from '@overnightjs/logger';
@@ -11,6 +11,7 @@ import {AskStage} from './stages/AskStage';
 import {EndStage} from './stages/EndStage';
 import {DistributeStage} from './stages/DistributeStage';
 import {StageSystem} from '../../components/StageSystem';
+import {IInputAction} from '../../network';
 
 
 export const STAGE_START = 'START';
@@ -35,8 +36,6 @@ export interface IBlackJackPlayerAction {
 }
 
 interface IBlackJackGameState {
-    playing: boolean;
-    players: IBlackJackPlayerState[];
     dealHand: ICard[];
     dealValue: number;
     countDown: number;
@@ -82,28 +81,18 @@ export class BlackJack implements IGame {
         this.stageSystem.currentStage = STAGE_START;
     }
 
-    private static castAction(action: any): IBlackJackPlayerAction | null {
+    private static isValidAction(action: any): boolean {
         if (typeof action.type === 'string') {
-            switch (action.type) {
-                case BlackJackPlayerActionType.PlayerAddChip:
-                    return {type: BlackJackPlayerActionType.PlayerAddChip, data: action.payload as number};
-                case BlackJackPlayerActionType.PlayerBet:
-                    return {type: BlackJackPlayerActionType.PlayerBet, data: null};
-                case BlackJackPlayerActionType.PlayerHit:
-                    return {type: BlackJackPlayerActionType.PlayerHit, data: null};
-                case BlackJackPlayerActionType.PlayerStand:
-                    return {type: BlackJackPlayerActionType.PlayerStand, data: null};
-                case BlackJackPlayerActionType.PlayerSurrender:
-                    return {type: BlackJackPlayerActionType.PlayerSurrender, data: null};
-                case BlackJackPlayerActionType.PlayerDouble:
-                    return {type: BlackJackPlayerActionType.PlayerDouble, data: null};
-                default:
-                    Logger.Warn(`[Black Jack] Receive invalid input action: ${action}`);
-                    return null;
+            if (action.type in BlackJackPlayerActionType) {
+                if (action.type === BlackJackPlayerActionType.PlayerAddChip) {
+                    return typeof action.payload === 'number';
+                } else {
+                    return true;
+                }
             }
         }
-        Logger.Warn(`[Black Jack] Receive invalid input action: ${action}`);
-        return null;
+        Logger.Warn(`[Black Jack] Receive invalid input action: ${action.type} ${action.payload}`);
+        return false;
     }
 
     public getRoomConfig(): IRoomConfig {
@@ -111,6 +100,7 @@ export class BlackJack implements IGame {
             tickFrequency: 1000,
             numberOfPlayerAllow: 5,
             gameName: 'BlackJack',
+            shareGamePlayerState: false,
         };
     }
 
@@ -152,20 +142,22 @@ export class BlackJack implements IGame {
         return smallestPossibleValue;
     }
 
-    public onPlayerEnter(player: PlayerController): void {
-        this.players[player.getId()] = new BlackJackPlayer(player.getId(), player.name, player.cash);
+    public onPlayerEnter(player: Player): void {
+        const gamePlayer = new BlackJackPlayer(player.id, player.name, player.cash);
+        this.players[player.id] = gamePlayer;
+        player.gamePlayer = gamePlayer;
     }
 
-    public onPlayerLeave(player: PlayerController): void {
+    public onPlayerLeave(player: Player): void {
         if (this.stageSystem.currentStage === STAGE_ASK) {
             const askStage = this.stageSystem.getCurrentStage() as AskStage;
-            if (!!askStage && askStage.getCurrentTurn() === player.getId()) {
+            if (!!askStage && askStage.getCurrentTurn() === player.id) {
                 askStage.nextBetPlayer();
             }
         }
-        player.cash = this.players[player.getId()].cash + this.players[player.getId()].chips.getCashValue();
+        player.cash = this.players[player.id].cash + this.players[player.id].chips.getCashValue();
         player.saveUser();
-        delete this.players[player.getId()];
+        delete this.players[player.id];
     }
 
     private getPromote(): string {
@@ -174,8 +166,6 @@ export class BlackJack implements IGame {
 
     public getGameState(): IBlackJackGameState {
         return {
-            playing: this.isPlaying(),
-            players: Object.values(this.players).map((p) => p.getState()),
             dealHand: this.dealerHand,
             dealValue: BlackJack.handValue(this.dealerHand),
             countDown: this.stageSystem.countDown,
@@ -186,12 +176,10 @@ export class BlackJack implements IGame {
         };
     }
 
-    public handlePlayerInput(player: PlayerController, action: any): void {
-        const playerIndex = player.getId();
-        const blackjackAction = BlackJack.castAction(action);
-        if (!!blackjackAction) {
-            Logger.Info(`[BlackJack] Player Input Received ${player.name}: ${blackjackAction.type} ${blackjackAction.data}`);
-            this.stageSystem.getCurrentStage().handlePlayerInput(playerIndex, blackjackAction);
+    public handlePlayerInput(player: Player, action: IInputAction): void {
+        if (!!BlackJack.isValidAction(action)) {
+            Logger.Info(`[BlackJack] Player Input Received ${player.name}: ${action.type} ${action.payload}`);
+            this.stageSystem.handlePlayerInput(player, action);
         }
     }
 

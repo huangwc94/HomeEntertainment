@@ -26,8 +26,8 @@ class App extends React.Component {
             alert("房间名称为空！");
             return;
         }
+        localStorage.setItem('HE-room-name', this.roomName);
         this.props.history.push('/room/'+gameName);
-
     };
 
     render() {

@@ -7,6 +7,8 @@ import CardStack from "../../components/CardStack";
 import Sound from 'react-sound';
 import PromotionAndCountdown from "../../components/PromotionAndCountdown";
 import PokerCard from "../../components/PokerCard";
+import {connect} from "react-redux";
+import BlackJackController from "./BlackJackController";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -54,8 +56,8 @@ const useStyles = makeStyles(theme => ({
 
 function BlackJack(props) {
 
-    const {state} = props;
-    const {gameState, players} = state;
+    const {remote} = props;
+    const {gameState, players} = remote;
     const styles = useStyles();
     return (
         <div className={styles.container}>
@@ -76,7 +78,7 @@ function BlackJack(props) {
 
             <div className={styles.playerContainer}>
                 {
-                    gameState.players.map((player) => <Player player={player} key={player.name} roomPlayer={players[player.id]}/>)
+                    Object.values(players).map((player) => (<Player player={player} key={player.id}/>))
                 }
             </div>
             <Sound
@@ -91,4 +93,7 @@ function BlackJack(props) {
     )
 }
 
-export default BlackJack;
+const mapState = (state) => ({
+    ...state
+});
+export default connect(mapState)(BlackJack);
