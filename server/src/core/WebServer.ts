@@ -1,9 +1,9 @@
 import * as express from 'express';
-import {Server} from 'http';
+import { Server } from 'http';
 import * as bodyParser from 'body-parser';
-import {WechatController} from '../controllers';
-import {AdminController} from '../controllers/AdminController';
-import {Logger} from '@overnightjs/logger';
+import { WechatController } from '../controllers';
+import { AdminController } from '../controllers/AdminController';
+import { Logger } from '@overnightjs/logger';
 
 
 export class WebServer {

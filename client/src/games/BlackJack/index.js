@@ -8,7 +8,7 @@ import Sound from 'react-sound';
 import PromotionAndCountdown from "../../components/PromotionAndCountdown";
 import PokerCard from "../../components/PokerCard";
 import {connect} from "react-redux";
-import BlackJackController from "./BlackJackController";
+
 
 const useStyles = makeStyles(theme => ({
     container: {

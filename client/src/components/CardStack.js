@@ -1,15 +1,25 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 //import svg from "./cards/1_of_clubs.svg";
-import posed, {PoseGroup} from 'react-pose';
-import PokerCard from "./PokerCard";
+import posed, { PoseGroup } from 'react-pose';
+import PokerCard from './PokerCard';
 
 const useStyles = makeStyles(theme => ({
     container: {
-        display:'flex',
+        display: 'flex',
+        position: 'relative',
+        justifyContent: 'center',
+        width: '100%',
+        minWidth: '10vw'
     },
-    card: {
-        width:'3vh',
+    description: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        zIndex: 50,
+        textAlign: 'center',
+        color:'white',
+        backgroundColor: 'rgba(0,0,0,0.3)',
     }
 }));
 
@@ -19,15 +29,15 @@ const Card = posed.div({
         x: -300,
         y: -200,
         opacity: 0,
-        transition:{
+        transition: {
             y: 'easeOut',
         }
     },
     enter: {
-        x:0,
-        y:0,
+        x: 0,
+        y: 0,
         opacity: 1,
-        transition:{
+        transition: {
             y: 'easeIn'
         }
     },
@@ -35,7 +45,7 @@ const Card = posed.div({
         x: 300,
         y: -200,
         opacity: 0,
-        transition:{
+        transition: {
             y: 'easeOut',
         }
     },
@@ -43,20 +53,36 @@ const Card = posed.div({
 
 function CardStack(props) {
 
-    const {cards, style} = props;
+    const {cards, display, height, description} = props;
 
     const styles = useStyles();
-
+    const cardWidth = !display ? '1vw' : null;
+    const justifyContent = display ? 'center' : 'flex-start';
     return (
-        <div className={styles.container} style={style}>
+        <div className={styles.container} style={{justifyContent}}>
             <PoseGroup
                 preEnterPose={'right'}
                 exitPose={'left'}
             >
                 {
-                    cards.map(({suit, value, show}, index) => (<Card className={styles.card} style={{zIndex:index +100}} key={index}><PokerCard  value={value} suit={suit} show={show}/></Card>))
+                    cards.map(({suit, value, show}, index) => (
+                        <Card
+                              style={{zIndex: index , width: cardWidth}}
+                              key={index}>
+                            <PokerCard value={value}
+                                       height={height}
+                                       suit={suit}
+                                       show={show}/>
+                        </Card>))
                 }
             </PoseGroup>
+            {
+                !!description &&
+                <div className={styles.description}>
+                    <h3>{description}</h3>
+                </div>
+            }
+
         </div>
     )
 }

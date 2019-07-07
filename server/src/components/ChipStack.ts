@@ -13,7 +13,7 @@ export const MAXIMUM_NUMBER_OF_CHIPS = 10;
 
 export class ChipStack {
 
-    constructor(private stack: IChipStack = [0, 0, 0, 0]) {
+    constructor(private stack: IChipStack = [0, 0, 0, 0], private sortChipFromLeft: boolean = true) {
 
     }
 
@@ -71,16 +71,28 @@ export class ChipStack {
 
         let remainingCashValue = this.getCashValue() + extraCash;
         // Get more greater value chips as possible
-        for (let index =  0; index < CHIP_VALUES.length; index++) {
-            const numberOfChip = Math.floor(remainingCashValue / CHIP_VALUES[index]);
-            if (numberOfChip > MAXIMUM_NUMBER_OF_CHIPS) {
-                this.stack[index] = MAXIMUM_NUMBER_OF_CHIPS;
-            } else {
-                this.stack[index] = numberOfChip;
-            }
-            remainingCashValue -= CHIP_VALUES[index] *  this.stack[index];
-        }
 
+        if (this.sortChipFromLeft) {
+            for (let index = 0; index < CHIP_VALUES.length; index++) {
+                const numberOfChip = Math.floor(remainingCashValue / CHIP_VALUES[index]);
+                if (numberOfChip > MAXIMUM_NUMBER_OF_CHIPS) {
+                    this.stack[index] = MAXIMUM_NUMBER_OF_CHIPS;
+                } else {
+                    this.stack[index] = numberOfChip;
+                }
+                remainingCashValue -= CHIP_VALUES[index] * this.stack[index];
+            }
+        } else {
+            for (let index = CHIP_VALUES.length - 1; index >= 0; index--) {
+                const numberOfChip = Math.floor(remainingCashValue / CHIP_VALUES[index]);
+                if (numberOfChip > MAXIMUM_NUMBER_OF_CHIPS) {
+                    this.stack[index] = MAXIMUM_NUMBER_OF_CHIPS;
+                } else {
+                    this.stack[index] = numberOfChip;
+                }
+                remainingCashValue -= CHIP_VALUES[index] * this.stack[index];
+            }
+        }
         return remainingCashValue;
     }
 }

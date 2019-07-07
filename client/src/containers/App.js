@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, TextField} from "@material-ui/core";
+import { Button, TextField } from '@material-ui/core';
 
 import './App.css';
 
@@ -7,7 +7,7 @@ class App extends React.Component {
 
     roomName;
 
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
@@ -22,18 +22,19 @@ class App extends React.Component {
 
     onGameSelected = (gameName) => {
 
-        if(!this.roomName){
-            alert("房间名称为空！");
+        if (!this.roomName) {
+            alert('房间名称为空！');
             return;
         }
         localStorage.setItem('HE-room-name', this.roomName);
-        this.props.history.push('/room/'+gameName);
+        this.props.history.push('/room/' + gameName);
     };
 
     render() {
 
         const gameList = {
             BlackJack: '21 点',
+            TexasHoldem: '德州扑克',
         };
 
         const defaultName = localStorage.getItem('HE-room-name') || '';
@@ -55,7 +56,8 @@ class App extends React.Component {
                 <div className='game-container'>
                     {
                         Object.keys(gameList).map((k) => (
-                            <Button  variant="contained" color="primary" key={k} onClick={() => this.onGameSelected(k)}>{gameList[k]}</Button>
+                            <Button variant="contained" color="primary" key={k}
+                                    onClick={() => this.onGameSelected(k)}>{gameList[k]}</Button>
                         ))
                     }
                 </div>

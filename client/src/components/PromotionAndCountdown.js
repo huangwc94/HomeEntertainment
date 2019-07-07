@@ -6,7 +6,7 @@ export default class PromotionAndCountdown extends React.PureComponent {
 
 
     componentWillReceiveProps(nextProps, nextContext) {
-        if(nextProps.countDown >= 0 && nextProps.countDown !== this.props.countDown){
+        if (nextProps.countDown >= 0 && nextProps.countDown !== this.props.countDown) {
             const audio = new Audio('/sounds/tick.mp3');
             const r = audio.play();
         }

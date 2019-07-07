@@ -1,0 +1,17 @@
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="302" width="302" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <ellipse stroke-dasharray="5,5" ry="140" rx="140" id="svg_1" cy="149" cx="150" stroke-width="10" stroke="#4a8465" fill="#221f5b"/>
+  <text stroke-opacity="0" stroke="#000000" transform="matrix(0.8819551467895508,0,0,0.8879310488700867,1.1214261054992676,10.135235767811537) " font-weight="bold" xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="90" id="svg_3" y="156.282161" x="35.578424" stroke-width="0" fill="#f8fca9">Dealer</text>
+  <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="90" id="svg_4" y="227.4375" x="62.5" stroke-width="0" fill="#f8fca9">庄家</text>
+ </g>
+</svg>

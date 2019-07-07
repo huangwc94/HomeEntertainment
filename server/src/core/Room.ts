@@ -1,9 +1,10 @@
-import {IPlayerState, Player} from './Player';
-import {IGame} from './Game';
-import {IInputAction, NotificationType, SocketEvent} from '../network';
-import {Socket} from 'socket.io';
-import {gameFactory} from '../games';
-import {Logger} from '@overnightjs/logger';
+import { ICard, Poker } from '../components/Poker';
+import { IPlayerState, Player } from './Player';
+import { IGame } from './Game';
+import { IInputAction, NotificationType, SocketEvent } from '../network';
+import { Socket } from 'socket.io';
+import { gameFactory } from '../games';
+import { Logger } from '@overnightjs/logger';
 import Timeout = NodeJS.Timeout;
 
 import * as _ from 'lodash';
@@ -13,6 +14,7 @@ export interface IRoomConfig {
     numberOfPlayerAllow: number;
     gameName: string;
     shareGamePlayerState: boolean;
+    numberOfPlayerRequired: number;
 }
 
 export interface IFullRoomState {
@@ -20,7 +22,9 @@ export interface IFullRoomState {
     game: string;
     players: IPlayerStateMapping;
     gameState: any;
+    config: IRoomConfig;
     maxPlayerNumber: number;
+    minPlayerNumber: number;
     isStarted: boolean;
 }
 
@@ -46,6 +50,8 @@ export class Room {
 
     private lastTickTime: number;
 
+    private isStarted: boolean;
+
     constructor(private gameType: string, private roomName: string, private socket: Socket) {
         this.players = {};
         this.game = gameFactory(gameType, this);
@@ -53,6 +59,7 @@ export class Room {
         this.prevFullState = null;
         this.tickHandle = null;
         this.lastTickTime = +new Date();
+        this.isStarted = false;
         this.broadcastFullUpdate();
     }
 
@@ -66,7 +73,7 @@ export class Room {
 
     public onPlayerLogin(player: Player) {
 
-        if (this.game.isPlaying() || this.config.numberOfPlayerAllow < Object.keys(this.players).length) {
+        if (this.isStarted || this.config.numberOfPlayerAllow < Object.keys(this.players).length) {
             Logger.Warn(`[Room] Cannot join new player as room reach maximum occupancy`);
             player.disconnect();
             return;
@@ -98,7 +105,7 @@ export class Room {
         player.socket.on(SocketEvent.CLIENT_READY, () => {
             player.ready = true;
             Logger.Info(`[Room]Player Ready ${player.name}`);
-            if (this.isAllReady()) {
+            if (this.isAllReady() && Object.keys(this.players).length >= this.config.numberOfPlayerRequired && !this.isStarted) {
                 this.startGame();
             }
             this.broadcastFullUpdate();
@@ -115,6 +122,7 @@ export class Room {
         if (!!this.tickHandle) {
             clearInterval(this.tickHandle);
         }
+        this.isStarted = true;
         this.tickHandle = setInterval(() => this.tick(), this.config.tickFrequency);
         this.broadcastFullUpdate();
     }
@@ -139,7 +147,7 @@ export class Room {
             Logger.Info(`[Room]Player Leave ${player.name}`);
             this.game.onPlayerLeave(player);
             delete this.players[player.id];
-            if (Object.keys(this.players).length === 0 && this.game.isPlaying()) {
+            if (Object.keys(this.players).length === 0 && this.isStarted) {
                 this.socket.disconnect();
                 Logger.Info(`[Room]All player Leave, kick room socket!`);
                 return;
@@ -165,7 +173,9 @@ export class Room {
             players: this.getPlayerStates(),
             gameState: this.game.getGameState(),
             maxPlayerNumber: this.config.numberOfPlayerAllow,
-            isStarted: this.game.isPlaying(),
+            minPlayerNumber: this.config.numberOfPlayerRequired,
+            isStarted: this.isStarted,
+            config: this.config,
         };
     }
 
@@ -179,7 +189,6 @@ export class Room {
                 }
             });
         }
-
         return state;
     }
 
@@ -193,7 +202,9 @@ export class Room {
             const playerState = this.getPlayerRoomState(player.id);
             player.send(SocketEvent.SERVER_FULL_STATE_UPDATE, playerState);
         });
-        this.prevFullState = state;
+
+        // clone state in case prevFullState was modified during game tick
+        this.prevFullState = _.cloneDeep(state);
     }
 
     public sendScreenAction(action: IInputAction) {

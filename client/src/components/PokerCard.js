@@ -1,15 +1,9 @@
 import React from 'react';
 
-const styles = {
-    card: {
-        height:'23vh',
-    }
-};
-
-export const allPokerCardResource = () =>{
+export const allPokerCardResource = () => {
     const images = [];
-    for(let i = 1; i < 13 ; i++){
-        for(let s in ['clubs','diamonds','spades','hearts']){
+    for (let i = 1; i < 13; i++) {
+        for (let s in ['clubs', 'diamonds', 'spades', 'hearts']) {
             const fileName = `/cards/${i}_of_${s.toLowerCase()}.svg`;
             images.push(fileName)
         }
@@ -28,18 +22,11 @@ export const allPokerCardResource = () =>{
 
 
 export class PokerCard extends React.PureComponent {
-
-    // constructor(props){
-    //     super(props);
-    //     this.state = {
-    //         poseState: 'exit'
-    //     };
-    // }
-    //
     componentDidMount() {
         const audio = new Audio('/sounds/cardSlide1.wav');
         const r = audio.play();
     }
+
     //
     // componentWillReceiveProps(nextProps, nextContext) {
     //     if(this.props.show !== nextProps.show){
@@ -56,18 +43,16 @@ export class PokerCard extends React.PureComponent {
     }
 
     render() {
-        const {suit, value, show} = this.props;
-
+        const {suit, value, show, height} = this.props;
+        const finalHeight = height || '23vh';
         const fileName = show ? `${value}_of_${suit.toLowerCase()}` : 'back';
 
         return (
             <div>
-                <img src={`/cards/${fileName}.svg`} alt={fileName} style={styles.card}/>
+                <img src={`/cards/${fileName}.svg`} alt={fileName} style={{height:finalHeight}}/>
             </div>
         )
     }
-
-
 }
 
 export default PokerCard;

@@ -1,17 +1,17 @@
-import {BlackJackPlayer} from './components/BlackJackPlayer';
-import {IGame} from '../../core/Game';
-import {Player} from '../../core/Player';
-import {IRoomConfig, Room} from '../../core/Room';
-import {ICard, Poker} from '../../components/Poker';
-import {Logger} from '@overnightjs/logger';
-import {StartStage} from './stages/StartStage';
-import {BetStage} from './stages/BetStage';
-import {DealStage} from './stages/DealStage';
-import {AskStage} from './stages/AskStage';
-import {EndStage} from './stages/EndStage';
-import {DistributeStage} from './stages/DistributeStage';
-import {StageSystem} from '../../components/StageSystem';
-import {IInputAction} from '../../network';
+import { BlackJackPlayer } from './components/BlackJackPlayer';
+import { IGame } from '../../core/Game';
+import { Player } from '../../core/Player';
+import { IRoomConfig, Room } from '../../core/Room';
+import { ICard, Poker } from '../../components/Poker';
+import { Logger } from '@overnightjs/logger';
+import { StartStage } from './stages/StartStage';
+import { BetStage } from './stages/BetStage';
+import { DealStage } from './stages/DealStage';
+import { AskStage } from './stages/AskStage';
+import { EndStage } from './stages/EndStage';
+import { DistributeStage } from './stages/DistributeStage';
+import { StageSystem } from '../../components/StageSystem';
+import { IInputAction } from '../../network';
 
 
 export const STAGE_START = 'START';
@@ -101,6 +101,7 @@ export class BlackJack implements IGame {
             numberOfPlayerAllow: 5,
             gameName: 'BlackJack',
             shareGamePlayerState: false,
+            numberOfPlayerRequired: 1,
         };
     }
 

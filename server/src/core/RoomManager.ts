@@ -1,8 +1,8 @@
-import {Room} from './Room';
-import {Socket} from 'socket.io';
-import {ILoginCredential, SocketEvent} from '../network';
-import {Logger} from '@overnightjs/logger';
-import {Player} from './Player';
+import { Room } from './Room';
+import { Socket } from 'socket.io';
+import { ILoginCredential, SocketEvent } from '../network';
+import { Logger } from '@overnightjs/logger';
+import { Player } from './Player';
 
 export interface IRoomMapping {
     [socketId: string]: Room;
@@ -29,7 +29,6 @@ export class RoomManager {
         if (!!rm) {
             rm.onPlayerLogin(player);
             player.socket.on(SocketEvent.DISCONNECT, () => rm.onPlayerLeave(player));
-            this.onSocketConnect(socket);
         } else {
             Logger.Warn(`[RoomManager] Cannot found room for: ${creds.data}`);
             socket.disconnect();
@@ -44,7 +43,6 @@ export class RoomManager {
         }
         try {
             this.rooms[socket.id] = new Room(creds.data, creds.name, socket);
-            this.onSocketConnect(socket);
         } catch (e) {
             Logger.Warn(`[RoomManager] Failed to create room with game: ${e}`);
             socket.disconnect();

@@ -3,8 +3,8 @@
  *
  * created by Weicheng Huang
  */
-import {WebServer} from './core/WebServer';
-import {SocketServer} from './core/SocketServer';
+import { WebServer } from './core/WebServer';
+import { SocketServer } from './core/SocketServer';
 import * as path from 'path';
 
 

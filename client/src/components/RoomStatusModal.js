@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
-import {ServerAddress, WechatRedirectUrl} from "../network";
-import {makeStyles} from '@material-ui/core/styles';
+import { ServerAddress, WechatRedirectUrl } from '../network';
+import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import QRCode from 'qrcode.react';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -78,9 +78,9 @@ function generateList(players) {
 
 export default function RoomStatusModal(props) {
     const {remote, back, connected, gameName, roomName} = props;
-    const {name, players, maxPlayerNumber} = remote;
+    const {name, players, maxPlayerNumber, minPlayerNumber} = remote;
     const classes = useStyles();
-    const connectionString = process.env.NODE_ENV === 'development' ? ServerAddress + "/controller/" + name + "/" + gameName : `${WechatRedirectUrl}${roomName}!${gameName}`;
+    const connectionString = process.env.NODE_ENV === 'development' ? ServerAddress + '/controller/' + name + '/' + gameName : `${WechatRedirectUrl}${roomName}!${gameName}`;
     const [modalStyle] = React.useState(getModalStyle);
     return (
         <Modal open={true}>
@@ -93,11 +93,11 @@ export default function RoomStatusModal(props) {
                         {roomName}
                     </Typography>
                     <QRCode value={connectionString} size={258} includeMargin={true}/>
-                    <span>扫码加入</span>
+                    <span>微信扫码加入</span>
                     {process.env.NODE_ENV === 'development' &&
                     <a href={connectionString} target='_blank'>{connectionString}</a>}
-                    <Typography variant="h5" id="modal-title" style={{color: 'black', textAlign: 'center'}}>
-                        Player: {players.length}/{maxPlayerNumber}
+                    <Typography variant="h5" id="modal-title" style={{color: Object.keys(players).length >= minPlayerNumber ? 'green' : 'black', textAlign: 'center'}}>
+                        Player: {Object.keys(players).length}/[{minPlayerNumber}-{maxPlayerNumber}]
                     </Typography>
                     <List className={classes.list}>
                         {generateList(players)}

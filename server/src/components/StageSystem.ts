@@ -1,5 +1,5 @@
-import {Player} from '../core/Player';
-import {IInputAction} from '../network';
+import { Player } from '../core/Player';
+import { IInputAction } from '../network';
 
 export interface IStage {
     stageStart(): void;

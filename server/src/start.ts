@@ -5,7 +5,7 @@
  */
 
 import HomeEntertainmentServer from './HomeEntertainmentServer';
-import {saveUser} from './store';
+import { saveUser } from './store';
 
 const server = new HomeEntertainmentServer(80);
 

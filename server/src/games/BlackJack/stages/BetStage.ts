@@ -1,8 +1,8 @@
-import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DISTRIBUTE} from '../index';
-import {Logger} from '@overnightjs/logger';
-import {StageSystem, IStage} from '../../../components/StageSystem';
-import {Player} from '../../../core/Player';
-import {IInputAction} from '../../../network';
+import { BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DISTRIBUTE } from '../index';
+import { Logger } from '@overnightjs/logger';
+import { StageSystem, IStage } from '../../../components/StageSystem';
+import { Player } from '../../../core/Player';
+import { IInputAction } from '../../../network';
 
 export const START_BET = '请下注';
 export const BET_MAXIMUM = 300;

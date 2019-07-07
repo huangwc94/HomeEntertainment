@@ -1,8 +1,8 @@
-import {Server} from 'http';
-import {Socket} from 'socket.io';
-import {Logger} from '@overnightjs/logger';
-import {RoomManager} from './RoomManager';
-import {ConnectType, ILoginCredential, SocketEvent} from '../network';
+import { Server } from 'http';
+import { Socket } from 'socket.io';
+import { Logger } from '@overnightjs/logger';
+import { RoomManager } from './RoomManager';
+import { ConnectType, ILoginCredential, SocketEvent } from '../network';
 
 export class SocketServer {
     private io: Server;

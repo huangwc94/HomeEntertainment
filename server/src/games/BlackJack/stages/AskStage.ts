@@ -1,10 +1,10 @@
-import {BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DEAL, STAGE_END} from '../index';
-import {BlackJackPlayer, BUSTED} from '../components/BlackJackPlayer';
-import {ICard} from '../../../components/Poker';
-import {Logger} from '@overnightjs/logger';
-import {IInputAction, NotificationType} from '../../../network';
-import {StageSystem, IStage} from '../../../components/StageSystem';
-import {Player} from '../../../core/Player';
+import { BlackJack, BlackJackPlayerActionType, IBlackJackPlayerAction, STAGE_DEAL, STAGE_END } from '../index';
+import { BlackJackPlayer, BUSTED } from '../components/BlackJackPlayer';
+import { ICard } from '../../../components/Poker';
+import { Logger } from '@overnightjs/logger';
+import { IInputAction, NotificationType } from '../../../network';
+import { StageSystem, IStage } from '../../../components/StageSystem';
+import { Player } from '../../../core/Player';
 
 export const PLAYER_TURN = '等待 {0} 要牌';
 export const DISPATCH_CARD = '等待发牌';
@@ -36,33 +36,30 @@ export class AskStage implements IStage {
 
             case BlackJackPlayerActionType.PlayerHit:
                 Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Hit`);
-                const card: ICard | null = this.game.poker.randomGet();
-                if (!!card) {
-                    gamePlayer.receiveCard(card, false);
-                    Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card ${card.suit} ${card.value}`);
+                const card: ICard = this.game.poker.randomGet();
+                gamePlayer.receiveCard(card, false);
+                Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card ${card.suit} ${card.value}`);
 
-                    if (!gamePlayer.canAsk()) {
-                        if (gamePlayer.state === BUSTED) {
-                            gamePlayer.lost();
-                        }
-                        Logger.Info(`[AskStage] Player ${player.name} ${gamePlayer.state}`);
-                        this.nextBetPlayer();
+                if (!gamePlayer.canAsk()) {
+                    if (gamePlayer.state === BUSTED) {
+                        gamePlayer.lost();
                     }
+                    Logger.Info(`[AskStage] Player ${player.name} ${gamePlayer.state}`);
+                    this.nextBetPlayer();
                 }
                 break;
 
             case BlackJackPlayerActionType.PlayerDouble:
                 if (gamePlayer.hand.length === 2 && gamePlayer.double()) {
                     Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Double`);
-                    const c: ICard | null = this.game.poker.randomGet();
-                    if (!!c) {
-                        gamePlayer.receiveCard(c, false);
-                        if (gamePlayer.state === BUSTED) {
-                            gamePlayer.lost();
-                        }
-                        Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card for double ${c.suit} ${c.value}`);
-                        this.nextBetPlayer();
+                    const c: ICard = this.game.poker.randomGet();
+                    gamePlayer.receiveCard(c, false);
+                    if (gamePlayer.state === BUSTED) {
+                        gamePlayer.lost();
                     }
+                    Logger.Info(`[AskStage] Player ${player.name} : ${playerIndex} Receive Card for double ${c.suit} ${c.value}`);
+                    this.nextBetPlayer();
+
                 } else {
                     if (gamePlayer.hand.length > 2) {
                         this.game.room.sendPlayerNotification(playerIndex, NotificationType.WARNING, '要牌后无法加倍');

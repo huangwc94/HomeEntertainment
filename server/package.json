@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha -r ./node_modules/ts-node/register test/**/*.test.ts",
     "start-dev": "nodemon --config \"./util/nodemon.json\"/",
+    "start-cmd": "nodemon --config \"./util/cmd_nodemon.json\"/",
     "build": "rm -rf ./build && tsc",
     "start": "node build/start.js"
   },
@@ -18,10 +19,12 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.0.8",
     "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "@types/ws": "^6.0.1",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nodemon": "^1.18.11",
+    "socket.io-client": "^2.2.0",
     "ts-node": "^8.1.0",
     "tslint": "^5.15.0",
     "typescript": "^3.4.3",
@@ -36,6 +39,8 @@
     "express": "^4.17.1",
     "lodash": "^4.17.11",
     "node-fetch": "^2.6.0",
+    "pokersolver": "^2.1.3",
+    "popmotion": "^8.7.0",
     "socket.io": "^2.2.0",
     "ws": "^7.0.1"
   }

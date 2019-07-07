@@ -7,7 +7,7 @@ const styles = {
     }
 };
 
-export const allChipResource = () =>{
+export const allChipResource = () => {
     const images = [];
 
     let fileName = `/chips/chip_5.png`;
@@ -38,7 +38,7 @@ export class Chip extends React.PureComponent {
         const audio = new Audio('/sounds/chipsStack4.wav');
         const r = audio.play();
         r.catch((e) => {
-           console.log(e);
+            console.log(e);
         });
     }
 

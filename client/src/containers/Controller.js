@@ -1,22 +1,22 @@
 import React from 'react';
-import Button from "@material-ui/core/Button";
+import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 
 import './Controller.css';
 import DoneIcon from '@material-ui/icons/Done';
 import ErrorIcon from '@material-ui/icons/Error';
-import {sendReady} from "../network";
+import { sendReady } from '../network';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
-import {ControllerList} from "../games";
+import { ControllerList } from '../games';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import * as queryString from 'query-string'
 
-import {connect} from "react-redux";
-import {connectToServer} from "../network";
+import { connect } from 'react-redux';
+import { connectToServer } from '../network';
 
 class Controller extends React.Component {
 
@@ -47,7 +47,7 @@ class Controller extends React.Component {
 
         const values = queryString.parse(this.props.location.search);
 
-        if(!!values.id){
+        if (!!values.id) {
             const {room} = this.props.match.params;
             this.id = values.id;
             this.connect(values.id, room);
@@ -61,12 +61,12 @@ class Controller extends React.Component {
     };
 
     connect = (name, room) => {
-        connectToServer( {type: 1, name: name, data: room, token: 111});
+        connectToServer({type: 1, name: name, data: room, token: 111});
     };
 
     onEnterClick = () => {
         if (!this.playerName) {
-            alert("玩家名称不能为空！");
+            alert('玩家名称不能为空！');
             return;
         }
 
@@ -91,7 +91,7 @@ class Controller extends React.Component {
     renderForm = () => {
         const values = queryString.parse(this.props.location.search);
 
-        if(!!values.id) {
+        if (!!values.id) {
             return (
                 <div className="Controller">
                     <div className="player-input-container">
@@ -102,7 +102,7 @@ class Controller extends React.Component {
                             onClick={() => window.location.reload()}>刷新</Button>
                 </div>
             );
-        }else{
+        } else {
             const defaultName = localStorage.getItem('HE-player-name') || '';
             const {room, game} = this.props.match.params;
             return (
@@ -137,7 +137,7 @@ class Controller extends React.Component {
                     <Button className="player-input-button" variant="contained" color="primary"
                             onClick={this.onReady}>就绪</Button>
                 </div>
-            :
+                :
                 this.renderForm()
         );
     };
@@ -148,7 +148,7 @@ class Controller extends React.Component {
                 {
                     this.props.remote.isStarted ?
                         this.renderGame()
-                    :
+                        :
                         this.renderLogin()
                 }
             </div>

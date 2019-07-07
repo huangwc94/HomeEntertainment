@@ -1,4 +1,4 @@
-import {FULL_REMOTE_UPDATE, TOGGLE_FULLSCREEN, SET_FULLSCREEN, SET_CONNECTED,RESET_STATE} from "./actions";
+import { FULL_REMOTE_UPDATE, TOGGLE_FULLSCREEN, SET_FULLSCREEN, SET_CONNECTED, RESET_STATE } from './actions';
 
 
 const homeEntertainmentDefaultState = () => ({

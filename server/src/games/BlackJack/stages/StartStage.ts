@@ -1,7 +1,7 @@
-import {BlackJack, STAGE_BET} from '../index';
-import {IStage, StageSystem} from '../../../components/StageSystem';
-import {Player} from '../../../core/Player';
-import {IInputAction} from '../../../network';
+import { BlackJack, STAGE_BET } from '../index';
+import { IStage, StageSystem } from '../../../components/StageSystem';
+import { Player } from '../../../core/Player';
+import { IInputAction } from '../../../network';
 
 export const WAIT_START = '等待游戏开始...';
 

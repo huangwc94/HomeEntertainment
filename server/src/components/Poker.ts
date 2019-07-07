@@ -39,13 +39,13 @@ export class Poker {
         this.shuffle();
     }
 
-    public card_left() {
+    public card_left(): number {
         return this.cardPool.length;
     }
 
-    public randomGet() {
+    public randomGet(): ICard {
         if (this.card_left() <= 0) {
-            return null;
+            throw new Error('[Poker] Card Stack is empty');
         }
         const card = this.cardPool.pop() as ICard;
         this.usedCards.push(card);
@@ -59,5 +59,31 @@ export class Poker {
             this.cardPool[i] = this.cardPool[j];
             this.cardPool[j] = temp;
         }
+    }
+
+    public static cardToString(card: ICard): string {
+        let str = '';
+        switch (card.value) {
+            case 1:
+                str = 'A';
+                break;
+            case 10:
+                str = 'T';
+                break;
+            case 11:
+                str = 'J';
+                break;
+            case 12:
+                str = 'Q';
+                break;
+            case 13:
+                str = 'K';
+                break;
+            default:
+                str = card.value.toString();
+                break;
+        }
+        str += card.suit[0].toLowerCase();
+        return str;
     }
 }

@@ -1,8 +1,8 @@
-import {ICard} from '../../../components/Poker';
-import {BlackJack} from '../index';
-import {ChipStack, IChipStack, CHIP_VALUES} from '../../../components/ChipStack';
-import {Logger} from '@overnightjs/logger';
-import {IGamePlayer} from '../../../core/Player';
+import { ICard } from '../../../components/Poker';
+import { BlackJack } from '../index';
+import { ChipStack, IChipStack, CHIP_VALUES } from '../../../components/ChipStack';
+import { Logger } from '@overnightjs/logger';
+import { IGamePlayer } from '../../../core/Player';
 
 
 // START GAME STATE
@@ -48,7 +48,7 @@ export interface IBlackJackPlayerState {
     id: string;
 }
 
-export class BlackJackPlayer implements IGamePlayer{
+export class BlackJackPlayer implements IGamePlayer {
 
     public hand: ICard[];
 
@@ -63,7 +63,7 @@ export class BlackJackPlayer implements IGamePlayer{
     constructor(public id: string, public name: string, chipsValues: number) {
         this.hand = [];
         // 5 25 50 100
-        this.bet = new ChipStack();
+        this.bet = new ChipStack([0, 0, 0, 0], false);
         this.chips = new ChipStack();
         this.state = WAIT_BET;
         this.cash = this.chips.evenChip(chipsValues);

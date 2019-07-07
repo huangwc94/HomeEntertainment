@@ -1,6 +1,6 @@
-import {Socket} from 'socket.io';
-import {SocketEvent} from '../network';
-import {saveUser, readUser} from '../store';
+import { Socket } from 'socket.io';
+import { SocketEvent } from '../network';
+import { saveUser, readUser } from '../store';
 
 export interface IPlayerState {
     name: string;

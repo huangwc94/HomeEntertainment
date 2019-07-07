@@ -1,9 +1,9 @@
-import {IBlackJackPlayerAction, BlackJack, STAGE_END} from '../index';
-import {ICard} from '../../../components/Poker';
-import {Logger} from '@overnightjs/logger';
-import {StageSystem, IStage} from '../../../components/StageSystem';
-import {Player} from '../../../core/Player';
-import {IInputAction} from '../../../network';
+import { IBlackJackPlayerAction, BlackJack, STAGE_END } from '../index';
+import { ICard } from '../../../components/Poker';
+import { Logger } from '@overnightjs/logger';
+import { StageSystem, IStage } from '../../../components/StageSystem';
+import { Player } from '../../../core/Player';
+import { IInputAction } from '../../../network';
 
 const DEALER_TURN = '庄家操作';
 
@@ -42,11 +42,9 @@ export class DealStage implements IStage {
             Logger.Info(`[DealStage] Dealer done hit`);
             this.stageSystem.changeStage(STAGE_END);
         } else {
-            const card: ICard | null = this.game.poker.randomGet();
-            if (!!card) {
-                Logger.Info(`[DealStage] Dealer receive card: ${card.value} ${card.suit}`);
-                this.game.dealerHand.push(card);
-            }
+            const card: ICard = this.game.poker.randomGet();
+            Logger.Info(`[DealStage] Dealer receive card: ${card.value} ${card.suit}`);
+            this.game.dealerHand.push(card);
         }
     }
 

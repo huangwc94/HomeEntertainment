@@ -1,10 +1,10 @@
-import {BlackJack, IBlackJackPlayerAction, STAGE_START} from '../index';
+import { BlackJack, STAGE_START } from '../index';
 
-import {Logger} from '@overnightjs/logger';
-import {ICard} from '../../../components/Poker';
-import {StageSystem, IStage} from '../../../components/StageSystem';
-import {Player} from '../../../core/Player';
-import {IInputAction} from '../../../network';
+import { Logger } from '@overnightjs/logger';
+import { ICard } from '../../../components/Poker';
+import { StageSystem, IStage } from '../../../components/StageSystem';
+import { Player } from '../../../core/Player';
+import { IInputAction } from '../../../network';
 
 const ROUND_END = '本局结束';
 

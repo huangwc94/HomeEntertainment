@@ -1,51 +1,54 @@
 .App {
-  text-align: center;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  font-size: calc(10px + 2vmin);
-  color: black;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: calc(10px + 2vmin);
+    color: black;
 }
 
-.room-input{
+.room-input {
 
-  width:50%;
-}
-.room-input label{
-  font-size: calc(1px + 2vmin);
+    width: 50%;
 }
 
-.room-input .input{
-  width: 100%;
+.room-input label {
+    font-size: calc(1px + 2vmin);
+}
+
+.room-input .input {
+    width: 100%;
 }
 
 .game-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex:1;
-  min-width: 50%;
-  margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 50%;
+    margin-top: 10px;
 }
 
 .game-container button {
-  width: 15vh;
-  height: 10vh;
+    width: 200px;
+    height: 50px;
+    margin: 5px;
+    font-size: calc(2px + 1vw);
+}
 
-  font-size: calc(2px + 2vmin);
+.room-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
-.room-container{
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
+
 .room-game {
-  flex: 1;
-  height: 100vh;
-  background-color:black;
-  overflow: hidden;
+    flex: 1;
+    height: 100vh;
+    background-color: black;
+    overflow: hidden;
 }
 

@@ -1,6 +1,6 @@
-import {Player} from './Player';
-import {IInputAction} from '../network';
-import {IRoomConfig} from './Room';
+import { Player } from './Player';
+import { IInputAction } from '../network';
+import { IRoomConfig } from './Room';
 
 
 export interface IGame {
@@ -18,8 +18,6 @@ export interface IGame {
     start(): void;
 
     end(): void;
-
-    isPlaying(): boolean;
 
     tick(delta: number): void;
 }
