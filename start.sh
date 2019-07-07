@@ -4,8 +4,8 @@ git pull
 
 docker container stop he
 docker container rm he
-docker container prune -y
-docker image prune -y
+docker container prune -f
+docker image prune -f
 
 docker build . --no-cache -t home-entertainment || exit 1
 
