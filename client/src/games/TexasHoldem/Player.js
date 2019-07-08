@@ -56,13 +56,13 @@ const useStyles = makeStyles(theme => ({
         width:'30%'
     },
 
-    foldImage: {
+    coverImage: {
         position:'absolute',
         top:'50%',
         left:'50%',
         transform: `translate(-${50}%, -${50}%)`,
         zIndex: 9999,
-        width:'20vw'
+        width:'16vw'
     }
 }));
 
@@ -98,10 +98,10 @@ function Player(props) {
     return (
         <div className={vertical ? styles.colContainer : styles.rowContainer} style={{borderColor}}>
             {
-                state==='玩家弃牌' && <img className={styles.foldImage} src='/texasholdem/fold.svg'/>
+                state==='玩家弃牌' && <img className={styles.coverImage} src='/texasholdem/fold.svg'/>
             }
             {
-                state==='玩家全压' && <img className={styles.foldImage} src='/texasholdem/allin.svg'/>
+                state==='玩家全压' && <img className={styles.coverImage} src='/texasholdem/allin.svg'/>
             }
             {
                 reverse ?
