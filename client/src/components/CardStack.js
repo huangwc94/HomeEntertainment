@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         zIndex: 50,
         textAlign: 'center',
         color:'white',
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     }
 }));
 
@@ -57,7 +57,7 @@ function CardStack(props) {
 
     const styles = useStyles();
     const cardWidth = !display ? '1vw' : null;
-    const justifyContent = display ? 'center' : 'flex-start';
+    const justifyContent = display ? 'space-around' : 'flex-start';
     return (
         <div className={styles.container} style={{justifyContent}}>
             <PoseGroup

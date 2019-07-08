@@ -76,7 +76,7 @@ class Admin extends React.Component {
             });
     }
 
-    handleAddMoney(id, currentCash) {
+    handleDepositMoney(id, currentCash) {
         fetch(ServerAddress + '/admin/modify', {
             headers: {
                 'authorization': this.token,
@@ -84,6 +84,26 @@ class Admin extends React.Component {
             },
             method: 'POST',
             body: JSON.stringify({[id]: {cash: currentCash + 1000}})
+        })
+            .then(() => this.fetchData())
+            .catch(e => {
+                console.log(e);
+                alert(e.toString())
+            });
+    }
+
+    handleWithdrawMoney(id, currentCash) {
+        let newCash = currentCash - 1000;
+        if (newCash < 0) {
+            newCash = 0;
+        }
+        fetch(ServerAddress + '/admin/modify', {
+            headers: {
+                'authorization': this.token,
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({[id]: {cash: newCash}})
         })
             .then(() => this.fetchData())
             .catch(e => {
@@ -107,7 +127,17 @@ class Admin extends React.Component {
                     <NameAndAvatar name={user.name} avatar={user.avatar}/>
                 </div>
                 <p style={{marginRight: '5vw'}}>${user.cash}</p>
-                <Button variant='outlined' onClick={() => this.handleAddMoney(user.id, user.cash)}>充值1000</Button>
+                <div style={{
+                    display:'flex',
+                    justifyContent:'flex-end',
+                    alignItems:'center',
+                    flex:1
+                }}>
+                    <Button variant='contained' color='primary' onClick={() => this.handleDepositMoney(user.id, user.cash)}>充值1000</Button>
+                    <Button variant='contained' color='secondary' disabled={user.cash <= 0}
+                            onClick={() => this.handleWithdrawMoney(user.id, user.cash)}>取款1000</Button>
+                </div>
+
             </div>
         )
     }

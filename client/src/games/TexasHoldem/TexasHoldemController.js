@@ -65,17 +65,17 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: '#456e4a',
         zIndex: 100,
         display: 'flex',
-        justifyContent:'center',
-        alignItems:'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 
 }));
 
 const CardCover = posed.div({
     draggable: 'y',
-    dragBounds:{top:0},
+    dragBounds: {top: 0},
     dragEnd: {
-        y:0,
+        y: 0,
         transition: tween
     }
 });
@@ -136,13 +136,27 @@ function TexasHoldemController(props) {
         return (
             <ButtonGroup variant="contained" fullWidth color="primary" className={styles.buttonGroup}>
                 <Button onClick={fold}>弃牌</Button>
-                <Button onClick={call} disabled={gamePlayerStatus().hand.length > 2}>跟注</Button>
-                <Button onClick={() => {
-                    setIsRaising(true);
-                }}
-                        disabled={gamePlayerStatus().betValue > gamePlayerStatus().chipValue || gamePlayerStatus().hand.length > 2}>加注</Button>
+                {
+                    gamePlayerStatus().betValue < remote.gameState.highestBet
+                    && gamePlayerStatus().betValue + gamePlayerStatus().chipValue >= remote.gameState.highestBet
+                    && <Button onClick={call}>跟注(+{remote.gameState.highestBet -  gamePlayerStatus().betValue})</Button>
+                }
+
+                {
+                    gamePlayerStatus().betValue + gamePlayerStatus().chipValue - remote.gameState.highestBet >= 5 &&
+
+                    <Button onClick={() => {
+                        setIsRaising(true);
+                    }}>加注</Button>
+                }
+
+
                 <Button onClick={allIn}>全压！</Button>
-                <Button onClick={check}>结束</Button>
+
+                {
+                    gamePlayerStatus().betValue >= remote.gameState.highestBet && <Button onClick={check}>结束</Button>
+                }
+
             </ButtonGroup>
         );
     };

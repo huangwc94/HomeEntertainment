@@ -11,7 +11,8 @@ const useStyles = makeStyles(theme => ({
         height: '10vh',
         width: '100%',
         justifyContent: 'space-around',
-
+        position: 'relative',
+        paddingBottom: '4vh',
     },
     stack: {
         display: 'flex',
@@ -21,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     },
     chip: {
         height: '1vh'
-    }
+    },
 }));
 
 const ChipAnimated = posed.div({
@@ -46,7 +47,7 @@ const ChipAnimated = posed.div({
 function chipRenderer(value, number, className) {
     const res = [];
     for (let index = 0; index < number; index++) {
-        res.push(<ChipAnimated className={className} style={{zIndex: index + 100}} key={index}><Chip
+        res.push(<ChipAnimated className={className} style={{zIndex: index}} key={index}><Chip
             value={value}/></ChipAnimated>)
     }
     return res;

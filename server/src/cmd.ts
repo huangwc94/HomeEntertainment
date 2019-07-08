@@ -47,6 +47,38 @@ rl.question('How many player? ', (numberOfPlayers) => {
                         clients[pn].emit('CLIENT_LOGIN', {type: 1, name: pn, token: 111, data: '客厅'});
                         clients[pn].on('SERVER_UPDATE', (data: any) => {
                             clientData[pn] = data;
+                            const p = data.players[pn];
+                            // @ts-ignore
+                            if (p.gamePlayerState.state === '正在行动') {
+                                setTimeout(() => {
+
+                                    if (Math.random() < 0.95) {
+                                        if (Math.random() < 0.5) {
+                                            if (data.gameState.highestBet === p.gamePlayerState.betValue) {
+                                                clients[pn].emit('CLIENT_ACTION', {type: 'PlayerCheck'});
+                                            } else if (p.gamePlayerState.betValue + p.gamePlayerState.chipValue > data.gameState.highestBet) {
+                                                clients[pn].emit('CLIENT_ACTION', {type: 'PlayerCall'});
+                                            } else if (Math.random() < 0.9) {
+                                                clients[pn].emit('CLIENT_ACTION', {type: 'PlayerFold'});
+                                            } else {
+                                                clients[pn].emit('CLIENT_ACTION', {type: 'PlayerAllIn'});
+                                            }
+                                        } else if (
+                                            Math.random() < 0.3
+                                            && (p.gamePlayerState.betValue + p.gamePlayerState.chipValue > data.gameState.highestBet + 25)
+                                            && p.gamePlayerState.chips[2] > 0) {
+                                            clients[pn].emit('CLIENT_ACTION', {type: 'PlayerRaise', payload: 25});
+                                            clients[pn].emit('CLIENT_ACTION', {type: 'PlayerRaiseConfirm'});
+                                        } else {
+                                            clients[pn].emit('CLIENT_ACTION', {type: 'PlayerFold'});
+                                        }
+
+                                    } else {
+                                        clients[pn].emit('CLIENT_ACTION', {type: 'PlayerAllIn'});
+                                    }
+
+                                }, Math.random() * 1000 + 500);
+                            }
                         });
                     });
                 }
@@ -58,6 +90,11 @@ rl.question('How many player? ', (numberOfPlayers) => {
                 if (!!player && !!type) {
                     clients[playerName].emit('CLIENT_ACTION', {type, payload: parseInt(payload, 10)});
                 }
+                break;
+            case 'allin':
+                Object.values(clients).forEach((client) => {
+                    client.emit('CLIENT_ACTION', {type: 'PlayerAllIn'});
+                });
                 break;
         }
         rl.prompt();

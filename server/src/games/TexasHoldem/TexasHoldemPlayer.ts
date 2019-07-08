@@ -103,13 +103,13 @@ export class TexasHoldemPlayer implements IGamePlayer {
 
         const remaining = this.chips.removeChipValue(callValue);
         if (remaining < 0) {
-            throw new Error('Cannot call: insufficient chips');
+            return;
         }
         this.cash += remaining;
         this.bet.removeAllChips();
         const betRemain = this.bet.addChipValue(highestBet);
         if (betRemain > 0) {
-            throw new Error(`Can not add value to bet ${this.bet.getCashValue()} ${betRemain}`);
+            return;
         }
         this.state = this.chips.getCashValue() === 0 ? ALL_IN : WAIT_OTHER;
     }
@@ -129,7 +129,7 @@ export class TexasHoldemPlayer implements IGamePlayer {
         if (this.chips.removeChip(chip)) {
             this.bet.addChip(chip);
         } else {
-            throw new Error('Can not raise Chip as no chip available');
+            return;
         }
         const valueRemainingToCall = highestBet - this.bet.getCashValue();
         if (valueRemainingToCall > 0) {
@@ -170,6 +170,7 @@ export class TexasHoldemPlayer implements IGamePlayer {
         this.state = WAIT_GAME;
         this.cash = this.chips.evenChip(this.cash);
         this.isDealer = false;
+        this.role = TexasHoldemRole.NONE;
     }
 
     public getGamePlayerState(): ITexasHoldemPlayerState {

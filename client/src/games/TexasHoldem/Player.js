@@ -36,8 +36,7 @@ const useStyles = makeStyles(theme => ({
         position:'relative',
     },
     chipContainer: {
-        width: '100%',
-        paddingBottom: '4vh',
+
     },
     nameAndBadge: {
         display:'flex',
@@ -46,8 +45,8 @@ const useStyles = makeStyles(theme => ({
         alignItems:'center'
     },
     badge: {
-        width:'3vw',
-        height:'3vw',
+        width:'2vw',
+        height:'2vw',
     },
     infoContainer: {
         width:'65%'
@@ -70,7 +69,7 @@ const useStyles = makeStyles(theme => ({
 function Player(props) {
     const {reverse, vertical} = props;
     const {name, avatar} = props.player;
-    const {hand, bet, betValue, state, isDealer, role, handResult} = props.player.gamePlayerState;
+    const {hand, bet, betValue, state, isDealer, role, handResult, chipValue, cash} = props.player.gamePlayerState;
 
     const styles = useStyles();
 
@@ -81,10 +80,6 @@ function Player(props) {
         case '正在行动':
             borderColor = 'white';
             poseState = 'blinkWhite';
-            break;
-        case '等待行动':
-            borderColor = '#42f4e5';
-            poseState = 'none';
             break;
         case '玩家加注':
             borderColor = '#a50b0b';
@@ -100,11 +95,6 @@ function Player(props) {
             break;
     }
 
-    const blinds = {
-        'BIG_BLIND': '大盲注',
-        'SMALL_BLIND': '小盲注',
-    };
-
     return (
         <div className={vertical ? styles.colContainer : styles.rowContainer} style={{borderColor}}>
             {
@@ -118,7 +108,7 @@ function Player(props) {
                     <React.Fragment>
                         <div className={styles.infoContainer} style={vertical ? {width: '100%'} : {}}>
                             <div className={styles.nameAndBadge}>
-                                <NameAndAvatar name={name} textStyle={{color: 'white'}} avatar={avatar}/>
+                                <NameAndAvatar name={name} textStyle={{color: 'white'}} avatar={avatar} description={`资产：${chipValue + cash}`}/>
                                 {isDealer && <img src={'/texasholdem/dealer.svg'} className={styles.badge}/>}
                                 {role === 'BIG_BLIND' && <img src={'/texasholdem/bb.svg'} className={styles.badge}/>}
                                 {role === 'SMALL_BLIND' && <img src={'/texasholdem/sb.svg'} className={styles.badge}/>}
@@ -139,7 +129,7 @@ function Player(props) {
                                 <ChipStack chips={bet}/>
                             </div>
                             <div className={styles.nameAndBadge}>
-                                <NameAndAvatar name={name} textStyle={{color: 'white'}} avatar={avatar}/>
+                                <NameAndAvatar name={name} textStyle={{color: 'white'}} avatar={avatar} description={`资产：${chipValue + cash}`}/>
                                 {isDealer && <img src={'/texasholdem/dealer.svg'} className={styles.badge}/>}
                                 {role === 'BIG_BLIND' && <img src={'/texasholdem/bb.svg'} className={styles.badge}/>}
                                 {role === 'SMALL_BLIND' && <img src={'/texasholdem/sb.svg'} className={styles.badge}/>}

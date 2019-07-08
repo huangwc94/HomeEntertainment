@@ -27,8 +27,8 @@ export class RoomManager {
         const player = new Player(creds.name, socket);
         Logger.Info(`[RoomManager] Player Login: ${creds.name} -> ${creds.data}`);
         if (!!rm) {
-            rm.onPlayerLogin(player);
             player.socket.on(SocketEvent.DISCONNECT, () => rm.onPlayerLeave(player));
+            rm.onPlayerLogin(player);
         } else {
             Logger.Warn(`[RoomManager] Cannot found room for: ${creds.data}`);
             socket.disconnect();

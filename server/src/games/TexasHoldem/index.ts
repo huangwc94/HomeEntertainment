@@ -164,27 +164,38 @@ export class TexasHoldem implements IGame {
     }
 
     public onPlayerEnter(player: Player): void {
-        if (player.cash < SMALL_BLIND_BET * 2) {
-            Logger.Info(`[TexasHoldem] Player ${player.name} is coming with no chips, kicked`);
-            player.disconnect();
-            return;
-        }
         const gamePlayer = new TexasHoldemPlayer(player.id, player.name, player.cash, this);
         this.players[player.id] = gamePlayer;
         player.gamePlayer = gamePlayer;
+        if (player.cash < SMALL_BLIND_BET * 2) {
+            Logger.Info(`[TexasHoldem] Player ${player.name} is coming with no chips, kicked`);
+            player.disconnect();
+        }
     }
 
     public onPlayerLeave(player: Player): void {
+
+        if (this.players[player.id].isDealer) {
+            const nextDealer = this.getPlayerArrayStartingAt(this.players[player.id], 1)[0];
+            nextDealer.isDealer = true;
+        }
+
         if (this.stageSystem.currentStage === STAGE_ACT) {
             const betStage = this.stageSystem.getCurrentStage() as ActStage;
             if (!!betStage && betStage.getCurrentTurn() === player.gamePlayer) {
                 betStage.nextActPlayer();
             }
         }
+
         player.cash = this.players[player.id].cash + this.players[player.id].chips.getCashValue();
+
+        // only player in game over stage can get back bet values
+        if (this.stageSystem.currentStage === STAGE_OVER) {
+            player.cash += this.players[player.id].bet.getCashValue();
+        }
+
         player.saveUser();
         delete this.players[player.id];
-
         if (this.getPlayerArray().length === 1) {
             this.stageSystem.changeStage(STAGE_OVER);
         }
