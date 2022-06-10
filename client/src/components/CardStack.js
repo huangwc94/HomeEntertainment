@@ -56,7 +56,7 @@ function CardStack(props) {
     const {cards, display, height, description} = props;
 
     const styles = useStyles();
-    const cardWidth = !display ? '1vw' : null;
+    const cardWidth = !display ? '3vh' : null;
     const justifyContent = display ? 'space-around' : 'flex-start';
     return (
         <div className={styles.container} style={{justifyContent}}>

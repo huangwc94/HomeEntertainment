@@ -4,7 +4,7 @@ import * as io from 'socket.io-client';
 import Socket = SocketIOClient.Socket;
 
 
-const playerNameBase = '玩家';
+const playerNameBase = '电脑玩家';
 
 const clients: { [id: string]: Socket } = {};
 
@@ -42,9 +42,9 @@ rl.question('How many player? ', (numberOfPlayers) => {
             case 'connect':
                 for (let i = 0; i < parseInt(numberOfPlayers, 10); i++) {
                     const pn = playerNameBase + i;
-                    clients[pn] = io('http://localhost');
+                    clients[pn] = io('http://he.ddns.net');
                     clients[pn].on('connect', () => {
-                        clients[pn].emit('CLIENT_LOGIN', {type: 1, name: pn, token: 111, data: '客厅'});
+                        clients[pn].emit('CLIENT_LOGIN', {type: 1, name: pn, token: 111, data: '567'});
                         clients[pn].on('SERVER_UPDATE', (data: any) => {
                             clientData[pn] = data;
                             const p = data.players[pn];

@@ -3,7 +3,7 @@ import React from 'react';
 export const allPokerCardResource = () => {
     const images = [];
     for (let i = 1; i < 13; i++) {
-        for (let s in ['clubs', 'diamonds', 'spades', 'hearts']) {
+        for (let s of ['clubs', 'diamonds', 'spades', 'hearts']) {
             const fileName = `/cards/${i}_of_${s.toLowerCase()}.svg`;
             images.push(fileName)
         }
@@ -24,7 +24,7 @@ export const allPokerCardResource = () => {
 export class PokerCard extends React.PureComponent {
     componentDidMount() {
         const audio = new Audio('/sounds/cardSlide1.wav');
-        const r = audio.play();
+        audio.play().catch((e) => console.log(e));
     }
 
     //
@@ -39,7 +39,7 @@ export class PokerCard extends React.PureComponent {
     //
     componentWillUnmount() {
         const audio = new Audio('/sounds/cardSlide3.wav');
-        const r = audio.play();
+        audio.play().catch((e) => console.log(e));
     }
 
     render() {
@@ -49,7 +49,7 @@ export class PokerCard extends React.PureComponent {
 
         return (
             <div>
-                <img src={`/cards/${fileName}.svg`} alt={fileName} style={{height:finalHeight}}/>
+                <img src={`/cards/${fileName}.svg`} alt={fileName} style={{height: finalHeight}}/>
             </div>
         )
     }

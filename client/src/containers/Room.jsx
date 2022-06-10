@@ -61,7 +61,6 @@ class Room extends React.Component {
             shouldHide: false,
         };
         this.lastAct = +new Date();
-        this.tickHandler = null;
     }
 
     componentDidMount() {
@@ -87,10 +86,6 @@ class Room extends React.Component {
                 shouldHide: false
             });
         }
-    }
-
-    onMouseMove(e) {
-
     }
 
     back = () => {
